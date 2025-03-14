@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+body {
+  background-color: #050a0e;
+  color: #00fff7;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 10px #00fff7;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+/* Cyberpunk Glowing Headings */
+h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  color: #00fff7;
+  text-shadow: 0 0 15px #00fff7, 0 0 30px #007bff;
+  animation: flicker 1.5s infinite alternate;
+}
+
+h2 {
+  font-size: 1.8rem;
+  color: #ff0077;
+  text-shadow: 0 0 10px #ff0077;
+}
+
+/* Main Dashboard Container */
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  border: 2px solid #00fff7;
+  box-shadow: 0 0 15px #00fff7;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+/* Neon Button */
+.button {
+  background: linear-gradient(45deg, #00fff7, #007bff);
+  color: black;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 15px #00fff7;
+  transition: 0.3s;
+}
+
+.button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px #00fff7;
+}
+
+/* Progress Bar */
+.progress-bar {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar div {
+  height: 10px;
+  background: linear-gradient(90deg, #ff0077, #00fff7);
+  width: 70%;
+}
+
+/* Cyberpunk Glitch Effect */
+@keyframes flicker {
+  0% { opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
