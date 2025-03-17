@@ -1,70 +1,120 @@
-# Getting Started with Create React App
+# HackDash - Modern Cybersecurity Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![HackDash Preview](https://i.imgur.com/QnmVkra.png)
 
-## Available Scripts
+A sleek, modern, and interactive cybersecurity dashboard built with React, TypeScript, and Tailwind CSS. Features real-time monitoring, threat visualization, and system resource tracking.
 
-In the project directory, you can run:
+## 🚀 Features
 
-### `npm start`
+- **Real-time Security Monitoring**
+  - Live security score tracking
+  - Dynamic threat detection
+  - Interactive network visualization
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **System Resource Tracking**
+  - CPU usage monitoring
+  - Memory utilization
+  - Storage capacity tracking
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Interactive Components**
+  - Network activity graph
+  - Global threat map
+  - Live terminal interface
+  - Activity log with severity levels
 
-### `npm test`
+- **Modern UI Elements**
+  - Animated components
+  - Responsive design
+  - Dark mode optimized
+  - Real-time updates
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠️ Technologies
 
-### `npm run build`
+- React 18
+- TypeScript
+- Tailwind CSS
+- Lucide Icons
+- Radix UI Components
+- Canvas API for visualizations
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🏗️ Installation
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Clone the repository:
+```bash
+git clone https://github.com/belhedianwer/hackdash.git
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Navigate to the project directory:
+```bash
+cd hackdash
+```
 
-### `npm run eject`
+3. Install dependencies:
+```bash
+npm install
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+4. Start the development server:
+```bash
+npm run dev
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🏗️ Project Structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+src/
+├── components/           # UI Components
+│   ├── ActivityLog.tsx   # Activity logging component
+│   ├── DashboardCard.tsx # Reusable card component
+│   ├── LiveAlerts.tsx    # Real-time alerts
+│   ├── NetworkGraph.tsx  # Network visualization
+│   ├── SecurityScore.tsx # Security metrics
+│   ├── SystemResources.tsx # Resource monitoring
+│   ├── Terminal.tsx      # Interactive terminal
+│   └── ThreatMap.tsx    # Global threat visualization
+├── lib/
+│   └── utils.ts         # Utility functions
+└── App.tsx              # Main application component
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🎨 Customization
 
-## Learn More
+### Theme Colors
+The dashboard uses a custom color scheme that can be modified in `index.css`:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```css
+:root {
+  --primary: hsl(0 0% 98%);
+  --secondary: hsl(0 0% 14.9%);
+  /* ... other color variables */
+}
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Adding New Components
+1. Create a new component in `src/components/`
+2. Import and add to the main dashboard in `App.tsx`
+3. Style using Tailwind CSS classes
 
-### Code Splitting
+## 📝 License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+MIT License - feel free to use this project for personal or commercial purposes.
 
-### Analyzing the Bundle Size
+## 🤝 Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-### Making a Progressive Web App
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 📧 Contact
 
-### Advanced Configuration
+Anwer Awled Belhedi
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- Website: [anwer-awled-belhedi.com](https://anwer-awled-belhedi.com)
+- LinkedIn: [linkedin.com/in/aabyna](https://www.linkedin.com/in/aabyna)
+- GitHub: [github.com/belhedianwer](https://github.com/belhedianwer)
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Project Link: [https://github.com/aabyna/hackdash](https://github.com/belhedianwer/hackdash)

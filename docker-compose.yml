@@ -2,7 +2,13 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    
+    container_name: app
+    volumes:
+      - ./server:/apps
     ports:
       - "8081:9090"
     depends_on:
