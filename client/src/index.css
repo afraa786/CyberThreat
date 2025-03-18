@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 :root {
   --background: 0 0% 3.9%;
   --foreground: 0 0% 98%;
