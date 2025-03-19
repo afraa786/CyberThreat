@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence, easeInOut } from 'framer-motion'
 import axios from 'axios'
+import CyberBackground from './CyberBackground'
 import { useNavigate } from 'react-router-dom'
 
 const Signup = () => {
@@ -82,15 +83,13 @@ const Signup = () => {
 
   return (
     <div className='h-screen w-screen flex justify-center bg-zinc-800 items-center'>
-      <motion.img
-        className='h-screen w-screen blur-md'
-        src='https://thumbs.dreamstime.com/b/d-render-abstract-cosmic-neon-background-glowing-laser-ring-rocks-under-starry-night-sky-reflection-water-216712620.jpg'
-        alt=''
-      />
+
+      <CyberBackground/>
+      
       <AnimatePresence>
         {signUp && (
             <motion.form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
-            className='h-[72vh] w-[70vw] bg-white bg-opacity-20 rounded-3xl absolute flex items-center flex-col'
+            className='h-[72vh] w-[70vw] bg-black bg-opacity-50 rounded-3xl absolute flex items-center flex-col'
             initial={{ x: '-100vw' }}
             animate={{ x: 0 }}
             exit={{ x: '100vw' }}
@@ -188,7 +187,7 @@ const Signup = () => {
         {login && (
           <motion.form
           onSubmit={(e) => { e.preventDefault();}}
-            className='h-[72vh] w-[70vw] bg-white bg-opacity-20 rounded-3xl absolute flex items-center flex-col justify-center z-10'
+            className='h-[72vh] w-[70vw] bg-black bg-opacity-50 rounded-3xl absolute flex items-center flex-col justify-center z-10'
             initial={{ x: '-100vw' }}
             animate={{ x: 0 }}
             exit={{ x: '100vw' }}

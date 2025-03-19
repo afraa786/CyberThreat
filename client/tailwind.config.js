@@ -57,6 +57,14 @@ export default {
         },
       },
       keyframes: {
+        moveGrid: {
+          '0%': { backgroundPosition: '0 0' },
+          '100%': { backgroundPosition: '20px 20px' },
+        },
+        glow: {
+          '0%, 100%': { opacity: '0.5' },
+          '50%': { opacity: '1' },
+        },
         'accordion-down': {
           from: {
             height: '0',
@@ -77,6 +85,8 @@ export default {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        moveGrid: 'moveGrid 5s linear infinite',
+        glow: 'glow 3s linear infinite',
       },
     },
   },
