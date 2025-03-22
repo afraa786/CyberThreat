@@ -25,14 +25,14 @@ body {
         padding: 10px;
     }  
 
-.cyberpunk-container {
+/* .cyberpunk-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   min-height: 100vh;
   padding: 20px;
-}
+} */
 
 .cyberpunk-title {
   font-size: 3rem;
@@ -40,26 +40,37 @@ body {
   animation: glitch 1.5s infinite;
 }
 
+@media screen and (max-width: 600px) {
+  .cyberpunk-title {
+    font-size: 2rem;
+  }
+}
+
+@media screen and (max-width: 430px) {
+  .cyberpunk-title {
+    font-size: 1.5rem;
+  }
+}
+
 @keyframes glitch {
   0% { text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; }
   50% { text-shadow: -2px -2px 0px #ff00ff, 2px 2px 0px #00ffff; }
   100% { text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; }
 }
-
 .cyberpunk-box {
   background: rgba(0, 0, 0, 0.9);
   border: 3px solid #ff00ff;
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 0 20px #ff00ff;
-  width: 100%;
-  max-width: 800px;
+  /* width: 100%;
+  max-width: 800px; */
   transition: transform 0.3s;
 }
 
-.cyberpunk-box:hover {
+/* .cyberpunk-box:hover {
   transform: scale(1.05);
-}
+} */
 
 .cyberpunk-input, .cyberpunk-select, .cyberpunk-textarea, .cyberpunk-button {
   width: 100%;
@@ -68,6 +79,7 @@ body {
   background: black;
   border: 2px solid #00ffff;
   color: #00ffff;
+  border-radius: 10px;
   font-size: 1rem;
   text-align: center;
   outline: none;

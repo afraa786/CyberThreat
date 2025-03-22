@@ -250,23 +250,32 @@ const Signup = () => {
       <AnimatePresence>
           {invalid &&
           <motion.div 
-          className='bg-black w-[30vw] h-[20vw] z-20 absolute rounded-2xl flex justify-center items-center flex-col'
-          initial={{y:"-100vh"}}
-          animate={{y:0}}
-          exit={{y:"-100vh"}}
-          transition={{duration:0.7,type:'spring',ease:easeInOut}}
+          className="bg-black/90 w-[30vw] h-[20vw] z-20 absolute rounded-2xl flex flex-col justify-center items-center shadow-xl border border-gray-700"
+          initial={{ y: "-100vh", opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: "-100vh", opacity: 0 }}
+          transition={{ duration: 0.7, type: "spring", ease: easeInOut }}
+        >
+          <p className="text-2xl text-red-500 font-semibold font-mono mb-1">
+            ❌ Invalid Username
+          </p>
+          <p className="text-xl text-gray-300 font-semibold font-mono">OR</p>
+          <p className="text-2xl text-red-500 font-semibold font-mono mt-1">
+            ❌ Invalid Password
+          </p>
+        
+          <motion.button
+            className="bg-gradient-to-r from-red-500 to-red-700 text-white w-[10vw] h-[4vw] rounded-3xl mt-[1vh] shadow-lg font-semibold tracking-wide hover:shadow-red-500"
+            initial={{ scale: 1 }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ rotate: 5, scale: 1 }}
+            transition={{ duration: 0.2, ease: easeInOut }}
+            onClick={() => setInvalid(false)}
           >
-            <p className=' text-2xl text-red-500 font-semibold font-mono'>Invalid Username ❌</p>
-            <p className=' text-2xl text-red-500 font-semibold font-mono'>OR</p>
-            <p className=' text-2xl text-red-500 font-semibold font-mono'>Invalid Password ❌</p>
-            <motion.button
-            className='bg-red-400 w-[10vw] h-[5vw] rounded-3xl mt-[1vh]'
-            initial={{scale:1}}
-            whileHover={{scale:1.2}}
-            whileTap={{rotate:5,scale:1}}
-            transition={{duration:0.2,ease:easeInOut}}
-             onClick={()=>{setInvalid(false)}}>OK</motion.button>
-          </motion.div>
+            OK
+          </motion.button>
+        </motion.div>
+        
 
           }
       </AnimatePresence>
