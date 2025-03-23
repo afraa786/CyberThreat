@@ -17,9 +17,9 @@ const router = createBrowserRouter([
     element: <App/>, // Load only this component
   },
   {
-    path: "/",
-    element: <Signup/>, // Load only this component
-  },
+    path:"/",
+    element:<Signup/>
+  }
 ]);
 
 createRoot(document.getElementById("root")!).render(
