@@ -38,3 +38,18 @@ body {
   background: theme('colors.neutral.900');
   color: theme('colors.neutral.100');
 }
+
+
+
+@layer base {}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
