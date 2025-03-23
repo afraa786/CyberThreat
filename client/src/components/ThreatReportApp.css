@@ -1,0 +1,129 @@
+/* Cyberpunk Theme */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+body {
+  background: url('your-image-url.jpg') no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Orbitron', sans-serif;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00eaff;
+  overflow-x: hidden;
+}
+.cyberpunk-input, .cyberpunk-textarea {
+    width: 100%;  /* Make inputs take full width */
+    height: 50px; /* Increase height */
+    font-size: 16px; /* Make text larger */
+    padding: 10px;
+  }
+  .cyberpunk-textarea {
+    height: 100px; /* Bigger text area */
+  }
+    .cyberpunk-button {
+        width: 100%; /* Make button take full width */
+        height: 50px; /* Increase height */
+        font-size: 16px; /* Make text larger */
+        padding: 10px;
+    }  
+
+.cyberpunk-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.cyberpunk-title {
+  font-size: 3rem;
+  font-weight: bold;
+  animation: glitch 1.5s infinite;
+}
+
+@keyframes glitch {
+  0% { text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; }
+  50% { text-shadow: -2px -2px 0px #ff00ff, 2px 2px 0px #00ffff; }
+  100% { text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; }
+}
+
+.cyberpunk-box {
+  background: rgba(0, 0, 0, 0.9);
+  border: 3px solid #ff00ff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px #ff00ff;
+  width: 100%;
+  max-width: 800px;
+  transition: transform 0.3s;
+}
+
+.cyberpunk-box:hover {
+  transform: scale(1.05);
+}
+
+.cyberpunk-input, .cyberpunk-select, .cyberpunk-textarea, .cyberpunk-button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: black;
+  border: 2px solid #00ffff;
+  color: #00ffff;
+  font-size: 1rem;
+  text-align: center;
+  outline: none;
+  transition: 0.3s;
+}
+
+.cyberpunk-input:focus, .cyberpunk-select:focus, .cyberpunk-textarea:focus {
+  box-shadow: 0 0 10px #00ffff;
+}
+
+.cyberpunk-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.cyberpunk-button {
+  background: #ff00ff;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cyberpunk-button:hover {
+  background: #ff0088;
+  box-shadow: 0 0 15px #ff00ff;
+}
+
+.cyberpunk-footer {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #ffffff;
+  opacity: 0.8;
+  text-align: center;
+  animation: flicker 1s infinite alternate;
+}
+
+@keyframes flicker {
+  0% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.cyberpunk-dropdown {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: black;
+  border: 2px solid #00ffff;
+  color: #00ffff;
+  font-size: 1rem;
+  text-align: center;
+  outline: none;
+  transition: 0.3s;
+}
+
+.cyberpunk-dropdown option {
+  background: black;
+  color: #00ffff;
+}

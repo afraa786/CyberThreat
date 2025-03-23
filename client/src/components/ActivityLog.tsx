@@ -2,7 +2,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Shield, AlertTriangle } from "lucide-react";
 
-const activities = [
+type Severity = "high" | "medium" | "low";
+
+const activities: {
+  id: number;
+  type: string;
+  message: string;
+  timestamp: string;
+  icon: React.ComponentType<{ className?: string }>;
+  severity: Severity;
+}[] = [
   {
     id: 1,
     type: "breach",
