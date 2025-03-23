@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import Signup from './components/Signup.tsx';
+// import Signup from './components/Signup.tsx';
 import CyberBackground from './components/CyberBackground.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
@@ -10,7 +10,7 @@ import './index.css';
 const router=createBrowserRouter([
   {
     path:'/',
-    element:<Signup/>
+    element:<App/>
   },
   {
     path:'/home',
