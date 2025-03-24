@@ -31,7 +31,7 @@ public class AuthService {
         user.setVerified(false);
         userRepository.save(user);
 
-        return "User registered successfully!";
+        return jwtUtil.generateToken(email);
     }
 
     public String loginUser(String email, String password) {
@@ -43,7 +43,7 @@ public class AuthService {
     }
 
     public User getUserFromToken(String token) {
-        String email = jwtUtil.extractEmail(token);
+        String email = jwtUtil.extractUsername(token);
         return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found!"));
     }
 }

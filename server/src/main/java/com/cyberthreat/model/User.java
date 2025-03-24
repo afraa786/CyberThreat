@@ -22,6 +22,6 @@ public class User {
     
     private boolean isVerified;
 
-    @Column(nullable = true) // Allow null OTP initially
+    @Column(nullable = true)
     private Integer otp;
 }
