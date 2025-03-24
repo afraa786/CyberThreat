@@ -198,7 +198,7 @@ const Signup = () => {
             </div>
 
             <div className='w-[42vw]'>
-              <h1 className='font-semibold'>Email</h1>
+              <h1 className='font-semibold text-xl'>Email</h1>
             </div>
             <input
               required
@@ -209,7 +209,7 @@ const Signup = () => {
               className=' placeholder-sky-200 outline-none p-2 border-[1px] border-white bg-transparent rounded h-[6vh] w-[42vw] m-1'
             />
             <div className='w-[42vw]'>
-              <h1 className='font-semibold'>Password</h1>
+              <h1 className='font-semibold text-3xl'>Password</h1>
             </div>
             <input
               required
