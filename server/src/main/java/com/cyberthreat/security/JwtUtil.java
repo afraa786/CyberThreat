@@ -6,8 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 @Component
@@ -21,12 +19,19 @@ public class JwtUtil {
     }
 
     public String generateToken(String email) {
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+        
+        System.out.println("=== Generated Token ==="); // Debug log
+        System.out.println("For email: " + email);
+        System.out.println("Token: " + token);
+        System.out.println("Expires at: " + new Date(System.currentTimeMillis() + EXPIRATION_TIME));
+        
+        return token;
     }
 
     public String extractUsername(String token) {
@@ -45,12 +50,28 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
-
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            final String username = extractUsername(token);
+            return (username.equals(userDetails.getUsername()) && 
+                   !isTokenExpired(token) && 
+                   !isTokenMalformed(token));
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
-
+    
+    private boolean isTokenMalformed(String token) {
+        try {
+            Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token);
+            return false;
+        } catch (MalformedJwtException e) {
+            return true;
+        }
+    }
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
