@@ -39,6 +39,14 @@ body {
   color: theme('colors.neutral.100');
 }
 
+/* h1{
+  font-family: monospace;
+}
+
+p{
+  font-family:monospace;
+  font-size: 7rem
+} */
 
 
 @layer base {}

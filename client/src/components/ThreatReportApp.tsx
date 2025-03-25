@@ -101,6 +101,8 @@ export default function ThreatReportApp() {
     <div className="cyberpunk-container flex p-3">
       <div className="cyberpunk-box h-screen! w-screen!">
       <h1 className="cyberpunk-title">🚨 Cyber Threat Report</h1>
+
+      
         <motion.input
           initial={{ scale: 1 }}
           whileHover={{ scale: 1.05 }}
@@ -109,7 +111,7 @@ export default function ThreatReportApp() {
 
           type="text"
           placeholder="Enter threat details..."
-          className=" bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
+          className=" hover:shadow-[0_0_20px_#00ffff] bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
              border-cyan-400 text-center text-base outline-none transition duration-300 ease-in-out focus:shadow-[0_0_10px_#00ffff] hover:cursor-pointer "
           value={threat}
           onChange={(e) => setThreat(e.target.value)}
@@ -122,9 +124,10 @@ export default function ThreatReportApp() {
           whileTap={{backgroundColor:"greenyellow"}}
           transition={{ duration: 0.2, ease: "easeInOut" }}
 
-          type="date"
-          className=" bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
-             border-cyan-400 text-center text-base outline-none transition duration-300 ease-in-out focus:shadow-[0_0_10px_#00ffff] hover:cursor-pointer"
+          type="text"
+          placeholder="dd/mm/yyyy"
+          className=" hover:shadow-[0_0_20px_#00ffff] bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
+             border-cyan-400 text-center text-base outline-none transition duration-300 ease-in-out focus:shadow-[0_0_10px_#00ffff] hover:cursor-pointer "
           value={dateHeard}
           onChange={(e) => setDateHeard(e.target.value)}
         />
@@ -132,7 +135,7 @@ export default function ThreatReportApp() {
 
       {/* Select Button */}
       <motion.div
-        className="cyberpunk-input p-2 cursor-pointer text-white bg-gray-800"
+        className=" hover:shadow-[0_0_20px_#00ffff] cyberpunk-input p-2 cursor-pointer text-white bg-gray-800"
         initial={{ scale: 1 }}
         whileHover={{ scale: 1.05 }}
         whileTap={{backgroundColor:"greenyellow"}}
@@ -182,7 +185,7 @@ export default function ThreatReportApp() {
           transition={{ duration: 0.2, ease: "easeInOut" }}
           
 
-          className=" bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
+          className=" hover:shadow-[0_0_20px_#00ffff] bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
              border-cyan-400 text-center text-base outline-none transition duration-300 ease-in-out focus:shadow-[0_0_10px_#00ffff] hover:cursor-pointer"
             type="text"
             placeholder="Enter phishing URL..."
@@ -229,6 +232,7 @@ export default function ThreatReportApp() {
                 onClick={() => {
                   setIncidentLocation(option.value);
                   setIsOpen1(false);
+                  console.log(option.value)
                 }}
               >
                 {option.label}
@@ -245,7 +249,7 @@ export default function ThreatReportApp() {
           whileHover={{ scale: 1.05 }}
           whileTap={{backgroundColor:"greenyellow"}}
           transition={{ duration: 0.2, ease: "easeInOut" }}
-          className=" bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
+          className=" hover:shadow-[0_0_20px_#00ffff] bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
           border-cyan-400 text-center text-base outline-none transition duration-300 ease-in-out focus:shadow-[0_0_10px_#00ffff] hover:cursor-pointer"
           placeholder="Additional information about the incident (Min 150, Max 1500 characters)"
           value={additionalInfo}
@@ -260,7 +264,7 @@ export default function ThreatReportApp() {
            whileHover={{ scale: 1.05 }}
            whileTap={{backgroundColor:"greenyellow"}}
            transition={{ duration: 0.2, ease: "easeInOut" }}
-           className=" bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
+           className=" hover:shadow-[0_0_20px_#00ffff] bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
            border-cyan-400 text-center text-base outline-none transition duration-300 ease-in-out focus:shadow-[0_0_10px_#00ffff] hover:cursor-pointer"
           type="text"
           placeholder="Reason for delay in reporting"
@@ -274,10 +278,10 @@ export default function ThreatReportApp() {
           whileHover={{ scale: 1.05 }}
           whileTap={{backgroundColor:"greenyellow"}}
           transition={{ duration: 0.2, ease: "easeInOut" }}
-          className=" bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
+          className=" hover:shadow-[0_0_20px_#00ffff] bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
           border-cyan-400 text-center text-base outline-none transition duration-300 ease-in-out focus:shadow-[0_0_10px_#00ffff] hover:cursor-pointer"
           type="url"
-          placeholder="LinkedIn Handle / URL"
+          placeholder={incidentLocation+" handle / URL"}
           value={linkedinURL}
           onChange={(e) => setLinkedinURL(e.target.value)}
         />
@@ -288,7 +292,8 @@ export default function ThreatReportApp() {
            whileHover={{ scale: 1.05 }}
            whileTap={{backgroundColor:"greenyellow"}}
            transition={{ duration: 0.2, ease: "easeInOut" }}
-           className=" bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
+           placeholder="Add Evidence"
+           className=" hover:shadow-[0_0_20px_#00ffff] bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
            border-cyan-400 text-center text-base outline-none transition duration-300 ease-in-out focus:shadow-[0_0_10px_#00ffff] hover:cursor-pointer"
           type="file"
           accept=".pdf,.jpg,.png"
@@ -301,7 +306,7 @@ export default function ThreatReportApp() {
            whileHover={{ scale: 1.05 }}
            whileTap={{backgroundColor:"greenyellow"}}
            transition={{ duration: 0.2, ease: "easeInOut" }}
-           className=" bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
+           className=" hover:shadow-[0_0_20px_#00ffff] bg-gray-800 text-cyan-400 rounded-xl shadow-lg w-full p-3 mb-2 border-2
            border-cyan-400 text-center text-base outline-none transition duration-300 ease-in-out focus:shadow-[0_0_10px_#00ffff] hover:cursor-pointer"
           placeholder="What would be your first step?"
           value={firstStep}
