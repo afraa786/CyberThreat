@@ -131,8 +131,8 @@ function ThreatReport() {
                     />
                     {(selectedId === 1 || selectedId === 5 || selectedId === 6 ) && 
                     <>
-                    <p className="text-white opacity-20 text-sm">Your text will be displayed here</p>
-                    <p>{inputValue}</p>
+                    <p className="text-white opacity-20 text-xs">Your text will be displayed here</p>
+                    <p className="text-xs">{inputValue}</p>
                     </>
                     }
                     
