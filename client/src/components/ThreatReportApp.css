@@ -65,6 +65,50 @@ height: 100%;
   50% { text-shadow: -2px -2px 0px #ff00ff, 2px 2px 0px #00ffff; }
   100% { text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; }
 }
+
+@media screen and (max-width:690px) {
+  .Card{
+    width: 70%;
+  }
+  .Card_text{
+    font-size: 0.5em;
+  }
+  .multiCards{
+    width: 45vw;
+  }
+  .multiCardsChild{
+    width: 35vw;
+  }
+  .IMGS{
+    width: 20vw;
+    height: 20vw;
+  }
+}
+
+@media screen and (max-width:480px) {
+  .DIVbox{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+  }
+  .Card{
+    width: 70%;
+  }
+  .Card_text{
+    font-size: 0.5em;
+  }
+  .multiCards{
+    width: 85vw;
+  }
+  .multiCardsChild{
+    width: 65vw;
+  }
+  .IMGS{
+    width: 20vw;
+    height: 20vw;
+  }
+}
 /*
 .cyberpunk-box {
   background: rgba(0, 0, 0, 0.9);
