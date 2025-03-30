@@ -32,8 +32,6 @@ function ThreatReport() {
   });
 
   const inputRef = useRef("");
-  const inputRef1 = useRef("");
-
 
   const items = [
     { id: 1, message:"Threat Details",img:Page,color:"bg-pink-100" },
@@ -145,9 +143,9 @@ function ThreatReport() {
 
                   <motion.h1
                     className=" text-white bg-black px-3 bg-opacity-30 font-semibold font-mono text-lg"
-                    initial={{opacity:0,width:"0%"}}
-                    animate={{opacity:1,width:"100%"}}
-                    transition={{duration:0.9}}
+                    initial={{opacity:0,width:"0%",scale:0.2}}
+                    animate={{opacity:1,width:"100%",scale:1}}
+                    transition={{duration:0.5}}
                   >{items.find((item) => item.id === selectedId)?.message}
                   </motion.h1>
 
@@ -184,12 +182,11 @@ function ThreatReport() {
                  {/* To display Options for Id 2*/ }
 
                   {selectedId === 2 && <>
-                  <div className="flex flex-col justify-center items-center w-[100%] ">
                     <div className="InputBar flex justify-between w-[100%]">
                     <motion.input type="date"
                       className="mt-2 outline-none rounded-xl text-black px-2"
                       initial={{opacity:0,width:"0%"}}
-                      animate={{opacity:1,width:"100%"}}
+                      animate={{opacity:1,width:"67%"}}
                       transition={{duration:0.9}}
                       value={inputValue}
                       onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
@@ -199,8 +196,7 @@ function ThreatReport() {
                      onClick={()=>{InputValue(selectedId, String(inputValue))}}
                     >Submit</button>
                     </div>
-                    <p className="Card_text text-3xl mt-6">{inputValue}</p>
-                    </div>
+                    <p className=" text-3xl mt-6">{inputValue}</p>
                   </>}
                  {/*To display Options for Id 3*/}
 
