@@ -1,7 +1,6 @@
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import ThreatReportApp from "./components/ThreatReportApp.tsx"; // Import your desired component
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.tsx";
 import Signup from "./components/Signup.tsx";
