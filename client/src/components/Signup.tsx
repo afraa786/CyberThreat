@@ -21,7 +21,7 @@ const Signup = () => {
 
   const FetchD = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/users')
+      const res = await axios.get('http://localhost:8080/api/auth/user')
       console.log(res.data)
     } catch (error) {
       console.log(error)

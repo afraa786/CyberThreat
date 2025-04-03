@@ -3,7 +3,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: springboot
+    container_name: springboot_1
     volumes:
       - ./server:/app
     ports:
