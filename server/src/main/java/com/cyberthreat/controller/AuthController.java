@@ -1,22 +1,26 @@
 package com.cyberthreat.controller;
 
 import com.cyberthreat.model.User;
+import com.cyberthreat.security.JwtUtil;
 import com.cyberthreat.service.AuthService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 import java.util.Collections;
-
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtUtil jwtUtil; // Added JwtUtil dependency
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, JwtUtil jwtUtil) {
         this.authService = authService;
+        this.jwtUtil = jwtUtil; // Initialize JwtUtil
     }
 
     @PostMapping("/register")
@@ -40,33 +44,54 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/user")
-public ResponseEntity<User> getUser(@RequestHeader("Authorization") String token) {
-    try {
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    @GetMapping("/validate-token")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
+        try {
+            String jwt = token.replace("Bearer ", "").trim();
+            Claims claims = jwtUtil.extractAllClaims(jwt);
+            
+            return ResponseEntity.ok(Map.of(
+                "valid", true,
+                "username", claims.getSubject(),
+                "expiresAt", claims.getExpiration()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                "valid", false,
+                "error", e.getMessage()
+            ));
         }
-        
-        // String jwtToken = token.replace("Bearer ", "").trim();
-        // if (jwtToken.isEmpty()) {
-        //     return ResponseEntity.badRequest().build();
-        // }
-        
-        User user = authService.getUserFromToken(token);
-        return ResponseEntity.ok(user);
-    } catch (JwtException e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-    } catch (RuntimeException e) {
-        return ResponseEntity.badRequest().build();
     }
-}
 
-    // Inner DTO classes
+    @GetMapping("/user")
+    public ResponseEntity<?> getUser(@RequestHeader("Authorization") String token) {
+        try {
+            if (token == null || !token.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            
+            String jwt = token.replace("Bearer ", "").trim();
+            if (jwt.isEmpty()) {
+                return ResponseEntity.badRequest().body("Empty token");
+            }
+            
+            User user = authService.getUserFromToken(token);
+            return ResponseEntity.ok(user);
+            
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "Invalid token: " + e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", "User not found"));
+        }
+    }
+
+    // Inner DTO classes remain unchanged
     static class RegistrationRequest {
         private String email;
         private String password;
 
-        // Getters and setters
         public String getEmail() {
             return email;
         }
@@ -88,7 +113,6 @@ public ResponseEntity<User> getUser(@RequestHeader("Authorization") String token
         private String email;
         private String password;
 
-        // Getters and setters
         public String getEmail() {
             return email;
         }
