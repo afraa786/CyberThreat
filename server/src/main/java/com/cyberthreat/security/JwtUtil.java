@@ -12,26 +12,23 @@ import java.util.function.Function;
 public class JwtUtil {
 
     private final String SECRET_KEY = "TPEsdVZFwffrAqdtEjAcK8u6zc/MhLFOreCV5n+YU+A=";
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 10; // 10 days (in milliseconds)
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
+    public long getExpirationTime() {
+        return EXPIRATION_TIME;
+    }
+
     public String generateToken(String email) {
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
-        
-        System.out.println("=== Generated Token ==="); // Debug log
-        System.out.println("For email: " + email);
-        System.out.println("Token: " + token);
-        System.out.println("Expires at: " + new Date(System.currentTimeMillis() + EXPIRATION_TIME));
-        
-        return token;
     }
 
     public String extractUsername(String token) {
@@ -43,24 +40,27 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    // **Changed from private to public**
+    public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
+
     public boolean validateToken(String token, UserDetails userDetails) {
         try {
-            final String username = extractUsername(token);
-            return (username.equals(userDetails.getUsername()) && 
-                   !isTokenExpired(token) && 
-                   !isTokenMalformed(token));
-        } catch (JwtException | IllegalArgumentException e) {
+            String username = extractUsername(token);
+            return username.equals(userDetails.getUsername()) 
+                && !isTokenExpired(token) 
+                && !isTokenMalformed(token);
+        } catch (Exception e) {
+            System.out.println("Validation error: " + e.getMessage());
             return false;
         }
     }
-    
+
     private boolean isTokenMalformed(String token) {
         try {
             Jwts.parserBuilder()
@@ -72,6 +72,7 @@ public class JwtUtil {
             return true;
         }
     }
+
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
