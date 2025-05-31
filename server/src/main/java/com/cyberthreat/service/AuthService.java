@@ -8,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class AuthService {
 
@@ -18,10 +16,10 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
-    public AuthService(UserRepository userRepository, 
-                     PasswordEncoder passwordEncoder, 
-                     JwtUtil jwtUtil,
-                     UserDetailsService userDetailsService) {
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil,
+                       UserDetailsService userDetailsService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -36,7 +34,8 @@ public class AuthService {
         User user = new User();
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        user.setVerified(false);
+        user.setVerified(true);  // Or set to false if email verification is required later
+        user.setRole("USER");    // Assign default role
         userRepository.save(user);
 
         return jwtUtil.generateToken(email);
@@ -44,16 +43,22 @@ public class AuthService {
 
     public String loginUser(String email, String password) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        
+
         if (passwordEncoder.matches(password, userDetails.getPassword())) {
             return jwtUtil.generateToken(email);
         }
         throw new RuntimeException("Invalid credentials!");
     }
 
-    public User getUserFromToken(String token) {
-        String email = jwtUtil.extractUsername(token);
+    public User getUserFromToken(String jwtToken) {
+        String email = jwtUtil.extractUsername(jwtToken);
         return userRepository.findByEmail(email)
-               .orElseThrow(() -> new RuntimeException("User not found!"));
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+    }
+
+    // New method to get User by email/username directly
+    public User getUserByUsername(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
     }
 }
