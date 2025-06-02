@@ -1,4 +1,4 @@
-package com.cyberthreat.config;
+package com.soturit.musashi;
 
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 
 @Component
-public class PdfReaderConfig {
+public class PdfFileReader {
     private final VectorStore vectorStore;
 
-    @Value("classpath:threat.pdf")
+    @Value("classpath:TIOBE.pdf")
     private Resource pdfResource;
 
-    public PdfReaderConfig(VectorStore vectorStore) {
+    public PdfFileReader(VectorStore vectorStore) {
         this.vectorStore = vectorStore;
     }
 

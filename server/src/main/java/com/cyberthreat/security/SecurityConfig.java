@@ -40,7 +40,7 @@ public class SecurityConfig {
                "/api/auth/register", "/api/auth/validate-token", 
                "/api/auth/user", "/error", "/swagger-ui/**", 
                "/v3/api-docs/**").permitAll()
-                .requestMatchers("/ask").permitAll()
+                .requestMatchers("/api/anthropic/**").permitAll()
 
 
                 // 👇 Role-based access

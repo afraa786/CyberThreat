@@ -1,10 +1,10 @@
-package com.cyberthreat.dto;
+// package com.cyberthreat.dto;
 
-import lombok.Data;
+// import lombok.Data;
 
-@Data
-public class ThreatReportDTO {
-    private String url;
-    private String threatType;
-    private String description;
-}
+// @Data
+// public class ThreatReportDTO {
+//     private String url;
+//     private String threatType;
+//     private String description;
+// }

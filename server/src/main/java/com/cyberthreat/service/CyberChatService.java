@@ -1,16 +1,24 @@
-package com.cyberthreat.service;
-import org.springframework.ai.chat.ChatClient;
-import org.springframework.stereotype.Service;
-@Service
-public class CyberChatService {
+// import org.springframework.ai.chat.ChatCompletionResponse;
+// import reactor.core.publisher.Mono;
 
-    private final ChatClient chatClient;
+// @Service
+// public class CyberChatService {
 
-    public CyberChatService(ChatClient chatClient) {
-        this.chatClient = chatClient;
-    }
+//     private final ChatClient chatClient;
 
-    public String getResponse(String userInput) {
-        return chatClient.call(userInput);
-    }
-}
+//     public CyberChatService(ChatClient chatClient) {
+//         this.chatClient = chatClient;
+//     }
+
+//     public String getResponse(String userInput) {
+//         Mono<ChatCompletionResponse> responseMono = chatClient.call(userInput);
+        
+//         // block() waits for the response synchronously
+//         ChatCompletionResponse response = responseMono.block();
+
+//         if (response != null && !response.choices().isEmpty()) {
+//             return response.choices().get(0).message().content();
+//         }
+//         return "No response from AI";
+//     }
+// }

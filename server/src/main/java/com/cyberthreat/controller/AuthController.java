@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 
 import java.util.Map;
 import java.util.Collections;
-import java.util.list;
 
 @RestController
 @RequestMapping("/api/auth")

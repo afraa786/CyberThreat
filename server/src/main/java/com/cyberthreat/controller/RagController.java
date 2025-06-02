@@ -1,4 +1,4 @@
-package com.cyberthreat.controller;
+package com.soturit.musashi;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class RagController {
         this.vectorStore = vectorStore;
     }
 
-    @GetMapping("/robobrain/rag")
+    @GetMapping("/api/rag")
     public ResponseEntity<String> generateAnswer(@RequestParam String query) {
         List<Document> similarDocuments = vectorStore.similaritySearch(query);
         String information = similarDocuments.stream()
@@ -34,11 +34,10 @@ public class RagController {
                 .collect(Collectors.joining(System.lineSeparator()));
         var systemPromptTemplate = new SystemPromptTemplate(
                 """
-        You are a helpful assistant. You must only use the details provided in the {information} section to answer questions. 
-        Do not rely on outside knowledge, inference, or assumptions. 
-        If the answer cannot be found in the provided information, respond clearly and politely with:
-        'I'm sorry, I couldn't find the answer to that based on the available information.'
-        Avoid guessing or adding extra context not explicitly mentioned in the source.
+                            You are a helpful assistant.
+                            Use only the following information to answer the question.
+                            Do not use any other information. If you do not know, simply answer: Unknown.
+                            {information}
                         """);
         var systemMessage = systemPromptTemplate.createMessage(Map.of("information", information));
         var userPromptTemplate = new PromptTemplate("{query}");

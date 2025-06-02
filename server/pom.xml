@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                              https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  
+
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -23,6 +23,19 @@
     <java.version>21</java.version>
     <spring-ai.version>0.8.1</spring-ai.version>
   </properties>
+
+  <!-- ✅ dependencyManagement must be placed outside dependencies -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-bom</artifactId>
+        <version>${spring-ai.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <!-- Spring Boot Starters -->
@@ -61,18 +74,24 @@
       <groupId>org.springframework.ai</groupId>
       <artifactId>spring-ai-pdf-document-reader</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-core</artifactId>
+    </dependency>
+
+    <!-- Devtools -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <!-- JWT -->
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-api</artifactId>
       <version>0.11.5</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-devtools</artifactId>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -116,18 +135,6 @@
     </dependency>
   </dependencies>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.springframework.ai</groupId>
-        <artifactId>spring-ai-bom</artifactId>
-        <version>${spring-ai.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <build>
     <plugins>
       <plugin>
@@ -149,10 +156,20 @@
     <repository>
       <id>spring-milestones</id>
       <name>Spring Milestones</name>
-      <url>https://repo.spring.io/milestone</url> <!-- Fixed URL -->
+      <url>https://repo.spring.io/milestone</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>
+
 </project>
+<!--
+  This POM file is configured for a Spring Boot application with the following features:
+  - Web, Data JPA, Security, Validation, Kafka support
+  - Spring AI integration for OpenAI, PDF reading, and PGVector
+  - JWT for authentication
+  - PostgreSQL as the database
+  - Lombok for reducing boilerplate code
+  - Devtools for development convenience
+  -->
