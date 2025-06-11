@@ -1,4 +1,4 @@
-package com.cyberthreat.service;
+package com.cyberthreat.security;
 
 import com.cyberthreat.model.User;
 import io.jsonwebtoken.*;

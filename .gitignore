@@ -33,4 +33,5 @@ build/
 .vscode/
 
 node_modules/
-aplication.properties
+application.properties
+.env

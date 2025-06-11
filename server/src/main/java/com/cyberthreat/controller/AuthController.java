@@ -4,7 +4,6 @@ import com.cyberthreat.model.User;
 import com.cyberthreat.security.JwtUtil;
 import com.cyberthreat.service.AuthService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -82,9 +81,6 @@ public ResponseEntity<?> getUser(Authentication authentication) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found"));
     }
 }
-
-
-    // DTOs
     static class RegistrationRequest {
         private String email;
         private String password;
