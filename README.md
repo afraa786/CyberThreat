@@ -19,15 +19,19 @@ The **Crowdsourced Cyber Threat Intelligence Platform** is a real-time threat re
 - **Supabase** (PostgreSQL) - Database for storing reported threats
 - **Apache Kafka** - Event streaming for real-time data processing
 - **Spring Security** - API authentication using JWT
+- **Flask** - URL detection Machine Learning Model
+- **FastAPI** - Cyber Security Analyst based Chat Model
 
 ### Frontend:
 - **React** - Modern UI framework
+- **TypeScript** - Integration
 - **Plain HTML** - structure of the frontend
 - **Tailwind CSS** - Cyberpunk-themed UI with animations
 
 ### Deployment & Tools:
 - **Docker** - Containerized environment for seamless deployment
 - **CI/CD** - Automating build and deployment pipelines (planned)
+- **Vercel** - Deployment
 
 ## Installation & Setup
 ### Prerequisites
