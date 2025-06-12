@@ -8,9 +8,9 @@ The **Crowdsourced Cyber Threat Intelligence Platform** is a real-time threat re
 - **Real-time Streaming**: Uses Apache Kafka for real-time data streaming and threat intelligence aggregation.
 - **Secure Authentication**: JWT-based authentication for secure API access.
 - **Gamified UI**: XP points, badges, and user levels to encourage participation.
-- **Live Cyber Threat Map**: A visual representation of reported threats (static for now).
+- **Live Cyber Threat Map**: A visual representation of reported threats.
 - **Leaderboard & Missions**: Tracks top contributors and assigns mission-based challenges.
-- **Real-time Notifications**: Displays alerts for newly reported threats (static for now).
+- **Real-time Notifications**: Displays alerts for newly reported threats.
 - **Cyberpunk-Themed UI**: Dark mode with neon blue, green, and purple accents, glitch effects, and holographic buttons.
 
 ## Tech Stack
