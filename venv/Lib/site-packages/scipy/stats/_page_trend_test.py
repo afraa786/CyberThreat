@@ -3,14 +3,11 @@ import numpy as np
 import math
 from ._continuous_distns import norm
 import scipy.stats
-from dataclasses import dataclass
+from dataclasses import make_dataclass
 
 
-@dataclass
-class PageTrendTestResult:
-    statistic: float
-    pvalue: float
-    method: str
+PageTrendTestResult = make_dataclass("PageTrendTestResult",
+                                     ("statistic", "pvalue", "method"))
 
 
 def page_trend_test(data, ranked=False, predicted_ranks=None, method='auto'):
@@ -110,7 +107,7 @@ def page_trend_test(data, ranked=False, predicted_ranks=None, method='auto'):
     [1]_, is:
 
     1. "Predetermine with careful logic the appropriate hypotheses
-       concerning the predicted ordering of the experimental results.
+       concerning the predicted ording of the experimental results.
        If no reasonable basis for ordering any treatments is known, the
        :math:`L` test is not appropriate."
     2. "As in other experiments, determine at what level of confidence
@@ -313,7 +310,7 @@ def page_trend_test(data, ranked=False, predicted_ranks=None, method='auto'):
     if method not in methods:
         raise ValueError(f"`method` must be in {set(methods)}")
 
-    ranks = np.asarray(data)
+    ranks = np.array(data, copy=False)
     if ranks.ndim != 2:  # TODO: relax this to accept 3d arrays?
         raise ValueError("`data` must be a 2d array.")
 
@@ -340,7 +337,7 @@ def page_trend_test(data, ranked=False, predicted_ranks=None, method='auto'):
     if predicted_ranks is None:
         predicted_ranks = np.arange(1, n+1)
     else:
-        predicted_ranks = np.asarray(predicted_ranks)
+        predicted_ranks = np.array(predicted_ranks, copy=False)
         if (predicted_ranks.ndim < 1 or
                 (set(predicted_ranks) != set(range(1, n+1)) or
                  len(predicted_ranks) != n)):
@@ -348,7 +345,7 @@ def page_trend_test(data, ranked=False, predicted_ranks=None, method='auto'):
                              f"from 1 to {n} (the number of columns in "
                              f"`data`) exactly once.")
 
-    if not isinstance(ranked, bool):
+    if type(ranked) is not bool:
         raise TypeError("`ranked` must be boolean.")
 
     # Calculate the L statistic
@@ -388,7 +385,7 @@ def _l_p_asymptotic(L, m, n):
     # Using [1] as a reference, the asymptotic p-value would be calculated as:
     # chi_L = (12*L - 3*m*n*(n+1)**2)**2/(m*n**2*(n**2-1)*(n+1))
     # p = chi2.sf(chi_L, df=1, loc=0, scale=1)/2
-    # but this is insensitive to the direction of the hypothesized ranking
+    # but this is insentive to the direction of the hypothesized ranking
 
     # See [2] page 151
     E0 = (m*n*(n+1)**2)/4
@@ -436,7 +433,7 @@ class _PageL:
         rank_perms = np.array(list(permutations(ranks)))
         # compute Page's L for all possible rows
         Ls = (ranks*rank_perms).sum(axis=1)
-        # count occurrences of each L value
+        # count occurences of each L value
         counts = np.histogram(Ls, np.arange(self.a-0.5, self.b+1.5))[0]
         # factorial(k) is number of possible permutations
         return counts/math.factorial(self.k)

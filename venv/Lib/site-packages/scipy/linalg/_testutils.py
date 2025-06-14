@@ -11,9 +11,7 @@ class _FakeMatrix2:
     def __init__(self, data):
         self._data = data
 
-    def __array__(self, dtype=None, copy=None):
-        if copy:
-            return self._data.copy()
+    def __array__(self):
         return self._data
 
 
@@ -60,6 +58,6 @@ def assert_no_overwrite(call, shapes, dtypes=None):
                 orig_inputs = [_get_array(s, dtype) for s in shapes]
                 inputs = [faker(x.copy(order)) for x in orig_inputs]
                 call(*inputs)
-                msg = f"call modified inputs [{dtype!r}, {faker!r}]"
+                msg = "call modified inputs [%r, %r]" % (dtype, faker)
                 for a, b in zip(inputs, orig_inputs):
                     np.testing.assert_equal(a, b, err_msg=msg)

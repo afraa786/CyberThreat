@@ -6,7 +6,7 @@ __license__ = "BSD"
 
 
 try:
-    from sklearn import *  # noqa: F403
+    from sklearn import *  # noqa
 
     _top_import_error = None
 except Exception as e:
