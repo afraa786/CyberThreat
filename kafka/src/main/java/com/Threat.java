@@ -13,6 +13,7 @@ public class Threat {
     private String type;
     private String threatDate;
     private String incidentLocation;
+    // location
     private String locationUrl;
     private String moreInformation;
     private String evidence;
