@@ -1,5 +1,6 @@
-package com.cyberthreat.controller;
+package com.cyberthreat.auth;
 
+import com.cyberthreat.Token.TokenBlacklistService;
 import com.cyberthreat.model.RegisterRequest;
 import com.cyberthreat.model.Users;
 import com.cyberthreat.Jwt.JwtUtil;
@@ -17,7 +18,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     @Autowired
@@ -25,6 +26,9 @@ public class AuthController {
 
     @Autowired
     private CustomUserDetailsService userService;
+    
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -48,6 +52,17 @@ public ResponseEntity<?> login(@RequestBody RegisterRequest request) {
         return ResponseEntity.status(401).body("Invalid credentials");
     }
 }
+
+   @PostMapping("/logout")
+public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        String token = authHeader.substring(7);
+        tokenBlacklistService.blacklistToken(token);
+        return ResponseEntity.ok("Logged out successfully");
+    }
+    return ResponseEntity.badRequest().body("No token found");
+}
+
 
 
     // ✅ REGISTER

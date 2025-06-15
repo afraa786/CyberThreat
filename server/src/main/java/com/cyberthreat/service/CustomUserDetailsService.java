@@ -1,5 +1,6 @@
 package com.cyberthreat.service;
 
+import com.cyberthreat.Token.TokenBlacklistService;
 import com.cyberthreat.model.*;
 import com.cyberthreat.repository.UserRepository;
 import com.cyberthreat.repository.RoleRepository;
