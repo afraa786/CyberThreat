@@ -1,6 +1,7 @@
 package com.cyberthreat.model;
 
 import jakarta.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -12,14 +13,15 @@ public class Users {
     @Column(name = "user_id")
     private int id;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "email", unique = true)
+private String email;
 
-    @Column(name = "password")
-    private String password;
+@Column(name = "password")
+private String password;
+
+
     @Column(name = "is_verified")
-private boolean isVerified = true;
-
+    private boolean isVerified = true;
 
     @Column(name = "name")
     private String name;
@@ -36,11 +38,14 @@ private boolean isVerified = true;
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>(); // ✅ Fix: initialized
 
+    // Default constructor
     public Users() {
+        // roles already initialized above
     }
 
+    // Copy constructor
     public Users(Users users) {
         this.active = users.getActive();
         this.email = users.getEmail();
@@ -49,6 +54,7 @@ private boolean isVerified = true;
         this.lastName = users.getLastName();
         this.id = users.getId();
         this.password = users.getPassword();
+        this.isVerified = users.isVerified();
     }
 
     // Getters and Setters
@@ -75,6 +81,14 @@ private boolean isVerified = true;
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean verified) {
+        isVerified = verified;
     }
 
     public String getName() {

@@ -13,9 +13,20 @@ public class Role {
 
     @Column(name = "role")
     private String role;
-
+public Role(String role) {
+    this.role = role;
+}
+    // Default constructor
     public Role() {
+        // No-arg constructor for JPA
     }
+
+    // Copy constructor
+    public Role(Role role) {
+        this.roleId = role.getRoleId();
+        this.role = role.getRole();
+}
+
 
     public int getRoleId() {
         return roleId;

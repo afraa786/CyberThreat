@@ -4,18 +4,20 @@ import com.cyberthreat.model.RegisterRequest;
 import com.cyberthreat.model.Users;
 import com.cyberthreat.Jwt.JwtUtil;
 import com.cyberthreat.service.CustomUserDetailsService;
-
+import com.cyberthreat.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 import jakarta.validation.Valid;
 
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     @Autowired
@@ -28,23 +30,25 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     // ✅ LOGIN
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody RegisterRequest request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(), request.getPassword())
-            );
+ @PostMapping("/login")
+public ResponseEntity<?> login(@RequestBody RegisterRequest request) {
+    try {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(), request.getPassword())
+        );
 
-            UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
-            String jwt = jwtUtil.generateToken(userDetails.getUsername());
+        UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
+        String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
-            return ResponseEntity.ok(jwt);
+        // ✅ Wrap the token in a JSON object so frontend can read it
+        return ResponseEntity.ok(Map.of("token", jwt));
 
-        } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(401).body("Invalid credentials");
-        }
+    } catch (BadCredentialsException ex) {
+        return ResponseEntity.status(401).body("Invalid credentials");
     }
+}
+
 
     // ✅ REGISTER
     @PostMapping("/register")
@@ -60,4 +64,5 @@ public class AuthController {
             return ResponseEntity.status(400).body("Registration failed: " + ex.getMessage());
         }
     }
+
 }

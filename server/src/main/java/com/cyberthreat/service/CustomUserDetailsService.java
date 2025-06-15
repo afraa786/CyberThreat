@@ -24,36 +24,30 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
+
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Users user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("Email not found: " + email));
+                    System.out.println("🔍 Found user: " + user.getEmail() + " with password: " + user.getPassword());
+
         return new CustomUserDetails(user);
+
     }
 
- 
-  public Users registerUser(RegisterRequest request) {
+ public Users registerUser(RegisterRequest request) {
     Users user = new Users();
-    user.setEmail(request.getEmail());
-    user.setPassword(passwordEncoder.encode(request.getPassword()));
     user.setName(request.getName());
     user.setLastName(request.getLastName());
-  user.setActive(1);
-    user.setIsVerified(true); // Skip verification
-    user.setRole(request.getRole().toUpperCase());
+    user.setEmail(request.getEmail());
+    user.setActive(1);
+   Role userRole = roleRepository.findByRole("ROLE_USER")
+        .orElseThrow(() -> new RuntimeException("Role not found"));
 
-    // Save the user first
-    Users savedUser = userRepository.save(user);
+user.setRoles(Set.of(userRole));
 
-    // Fetch the role
-    Role role = roleRepository.findByRole(request.getRole().toUpperCase())
-            .orElseThrow(() -> new RuntimeException("Role not found"));
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
+     // 🔥 encode it here
 
-    // Map role to user
-    savedUser.getRoles().add(role);
-
-    // Save again to persist role mapping
-    return userRepository.save(savedUser);
+    return userRepository.save(user);
 }
-
 }
