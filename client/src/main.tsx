@@ -6,6 +6,7 @@ import App from "./App.tsx";
 import Signup from "./components/Signup.tsx";
 import ThreatReport from "./components/ThreatReport.tsx";
 import Chatbot from "./components/Chatbot";   // Import chatbot
+import Url from "./components/Url.tsx";
 
 import "./index.css";
 
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "/chatbot",
     element: <Chatbot />,     // Add chatbot route here
+  },
+  {
+    path: "/url",
+    element: <Url />,
   },
 ]);
 
