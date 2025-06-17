@@ -7,6 +7,9 @@ import Signup from "./components/Signup.tsx";
 import ThreatReport from "./components/ThreatReport.tsx";
 import Chatbot from "./components/Chatbot";   // Import chatbot
 import Url from "./components/Url.tsx";
+import Chatbox from "./components/Chatbox.tsx";
+import Token from "./components/Tokens.tsx";
+
 
 import "./index.css";
 
@@ -30,6 +33,14 @@ const router = createBrowserRouter([
   {
     path: "/url",
     element: <Url />,
+  },
+  {
+    path: "/chatbox",
+    element: <Chatbox />,
+  },
+  {
+    path : "/token",
+    element: <Token />,
   },
 ]);
 
