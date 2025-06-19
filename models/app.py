@@ -3,6 +3,7 @@ import numpy as np
 import pickle
 import warnings
 from feature import FeatureExtraction
+from flask_cors import CORS
 
 # Suppress warnings
 warnings.filterwarnings('ignore')
@@ -12,6 +13,8 @@ with open("pickle/new_model.pkl", "rb") as file:
     gbc = pickle.load(file)
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173"])
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Terminal as TerminalIcon, Shield, Cpu, Network, Activity, Lock, Menu, LogOut } from 'lucide-react';
+import { Terminal as TerminalIcon, Shield, Cpu, Network, Activity, Lock, Menu, LogOut, User } from 'lucide-react';
 import { DashboardCard } from './components/DashboardCard';
 import { NetworkGraph } from './components/NetworkGraph';
 import { ActivityLog } from './components/ActivityLog';
@@ -37,6 +37,11 @@ function App() {
     }
   };
 
+
+  function handleProfileClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    event.preventDefault();
+    navigate('/profile');
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800">
@@ -85,10 +90,19 @@ function App() {
                   </li>
                   <li className="group relative">
                     <button
-                      onClick={() => navigate("/chatbox")}
+                      onClick={() => navigate("/community")}
                       className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
                     >
                       <span>Community</span>
+                    </button>
+                    <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
+                  </li>
+                  <li className="group relative">
+                    <button
+                      onClick={() => navigate("/threat")}
+                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                    >
+                      <span>ThreatSnitch</span>
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
@@ -111,6 +125,17 @@ function App() {
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
+
+                  <li className="group relative">
+                    <button
+                      onClick={() => navigate("/")}
+                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                    >
+                      <span>FAQs</span>
+                    </button>
+                    <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
+                  </li>
+
 
                 </ul>
               </nav>
@@ -143,6 +168,16 @@ function App() {
               >
                 <LogOut className="h-5 w-5" />
               </button>
+
+              {/* User Profile Button */}
+              <button
+                onClick={handleProfileClick}
+                className="flex items-center justify-center rounded-full bg-blue-500/10 p-2 text-blue-400 transition-all hover:bg-blue-500/20 hover:text-blue-300"
+                title="Profile"
+              >
+                <User className="h-5 w-5" />
+              </button>
+
             </div>
           </div>
 
