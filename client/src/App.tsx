@@ -128,7 +128,7 @@ function App() {
 
                   <li className="group relative">
                     <button
-                      onClick={() => navigate("/")}
+                      onClick={() => navigate("/faqs")}
                       className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
                     >
                       <span>FAQs</span>
@@ -190,14 +190,28 @@ function App() {
                   </a>
                 </li>
                 <li className="group">
-                  <a href="#" className="block text-neutral-400 hover:text-emerald-400 py-1">
+                  <button
+                    onClick={() => navigate("/community")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
                     Community
-                  </a>
+                  </button>
                 </li>
                 <li className="group">
-                  <a href="#" className="block text-neutral-400 hover:text-emerald-400 py-1">
+                  <button
+                    onClick={() => navigate("/token")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
                     Tokens
-                  </a>
+                  </button>
+                </li>
+                <li className="group">
+                  <button
+                    onClick={() => navigate("/faqs")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
+                    FAQs
+                  </button>
                 </li>
                 <li className="group pt-2 border-t border-neutral-700">
                   <button
