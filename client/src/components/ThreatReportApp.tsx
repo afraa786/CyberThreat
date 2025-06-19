@@ -23,6 +23,7 @@ import IntroSection from './IntroSection';
 import ThreatTypeCard from './ThreatTypeCard';
 import FormStep from './FormStep';
 import ConfirmationScreen from './ConfirmationScreen';
+import { useNavigate } from 'react-router-dom';
 
 import { ThreatFormData, ThreatType, UserProgress as UserProgressType, ValidationError, SubmissionResult } from '../types';
 
@@ -237,9 +238,18 @@ const ThreatReportApp: React.FC = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      <ParticlesBackground />
+  function handleBack(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    event.preventDefault();
+    setShowIntro(true);
+    setCurrentStep(0);
+    setErrors([]);
+  }
+
+return (
+  <div className="min-h-screen bg-black text-white relative overflow-hidden">
+    <ParticlesBackground />
+    <BackToHomeButton />
+
       
       {/* Header */}
       <motion.header
@@ -271,6 +281,8 @@ const ThreatReportApp: React.FC = () => {
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-4 gap-8">
+
+          
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             <ThreatLevelMeter level={threatLevel} recentReports={recentReports} />
@@ -632,5 +644,31 @@ const ThreatReportApp: React.FC = () => {
     </div>
   );
 };
+
+function BackToHomeButton() {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate("/home");
+  };
+
+  return (
+    <div className="absolute top-4 left-4 z-50">
+      <button
+        onClick={handleBack}
+        className="group flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-all duration-300"
+        title="Back to Home"
+      >
+        <div className="relative">
+          <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-md group-hover:blur-lg transition-all duration-300 animate-pulse" />
+          <div className="relative w-10 h-10 bg-blue-600/20 border border-blue-500 rounded-full flex items-center justify-center group-hover:bg-blue-600/30 group-hover:border-blue-400 transition-all duration-300 shadow-[0_0_12px_2px_rgba(59,130,246,0.5)]">
+            <ChevronLeft className="w-5 h-5" />
+          </div>
+        </div>
+        <span className="font-semibold text-base tracking-wide">Back to Home</span>
+      </button>
+    </div>
+  );
+}
 
 export default ThreatReportApp;

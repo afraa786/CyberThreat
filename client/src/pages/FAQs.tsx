@@ -122,7 +122,7 @@ const FAQsPage = () => {
 
   // Updated to use navigate for home navigation - same pattern as other nav items
   const handleBackToHome = () => {
-    navigate("/");
+    navigate("/home");
   };
 
   const handleEmailContact = () => {

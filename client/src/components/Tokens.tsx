@@ -1,6 +1,35 @@
-import { useState, useEffect } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { FiRefreshCw, FiCheck, FiExternalLink } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+
+// ✅ Blue Glowy Top-Left Back Button Component
+function BackToHomeButton() {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate("/home");
+  };
+
+  return (
+    <div className="absolute top-4 left-4 z-50">
+      <button
+        onClick={handleBack}
+        className="group flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-all duration-300"
+        title="Back to Home"
+      >
+        <div className="relative">
+          <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-md group-hover:blur-lg transition-all duration-300 animate-pulse" />
+          <div className="relative w-10 h-10 bg-blue-600/20 border border-blue-500 rounded-full flex items-center justify-center group-hover:bg-blue-600/30 group-hover:border-blue-400 transition-all duration-300 shadow-[0_0_12px_2px_rgba(59,130,246,0.5)]">
+            <ArrowLeft className="w-5 h-5" />
+          </div>
+        </div>
+        <span className="font-semibold text-base tracking-wide">Back to Home</span>
+      </button>
+    </div>
+  );
+}
 
 export default function Tokens() {
   const [apiKey, setApiKey] = useState<string>('sk-live-3f4e1c9a12xx...');
@@ -15,7 +44,6 @@ export default function Tokens() {
 
   const regenerateKey = () => {
     setIsRegenerating(true);
-    // Simulate API call delay
     setTimeout(() => {
       const randomPart = Math.random().toString(36).substring(2, 10);
       setApiKey(`ak-live-${randomPart}12xx...`);
@@ -34,10 +62,13 @@ export default function Tokens() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="relative min-h-screen bg-gray-900 text-white p-6">
+      {/* 🔵 Top-left back button */}
+      <BackToHomeButton />
+
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-emerald-400">API Tokens</h1>
-        
+
         {/* API Key Card */}
         <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 mb-8 border border-gray-700">
           <h2 className="text-xl font-semibold mb-4">Your API Key</h2>
@@ -77,30 +108,37 @@ export default function Tokens() {
         {/* Usage Stats Card */}
         <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 mb-8 border border-gray-700">
           <h2 className="text-xl font-semibold mb-4">Usage Statistics</h2>
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <h3 className="text-sm text-gray-400 mb-1">Daily Requests</h3>
               <div className="text-2xl font-bold">
-                {usageStats.used} <span className="text-gray-400 text-lg">/ {usageStats.limit}</span>
+                {usageStats.used}{' '}
+                <span className="text-gray-400 text-lg">/ {usageStats.limit}</span>
               </div>
               <div className="w-full bg-gray-700 h-2 mt-2 rounded-full">
-                <div 
-                  className="bg-emerald-500 h-2 rounded-full" 
-                  style={{ width: `${(usageStats.used / usageStats.limit) * 100}%` }}
+                <div
+                  className="bg-emerald-500 h-2 rounded-full"
+                  style={{
+                    width: `${(usageStats.used / usageStats.limit) * 100}%`,
+                  }}
                 ></div>
               </div>
             </div>
 
             <div>
               <h3 className="text-sm text-gray-400 mb-1">Rate Limit</h3>
-              <div className="text-2xl font-bold">{usageStats.requestsPerSecond} <span className="text-gray-400 text-lg">req/s</span></div>
+              <div className="text-2xl font-bold">
+                {usageStats.requestsPerSecond}{' '}
+                <span className="text-gray-400 text-lg">req/s</span>
+              </div>
               <p className="text-sm text-gray-400 mt-1">Max requests per second</p>
             </div>
 
             <div>
               <h3 className="text-sm text-gray-400 mb-1">Next Reset</h3>
-              <div className="text-2xl font-bold">{formatResetTime(usageStats.resetTime)}</div>
+              <div className="text-2xl font-bold">
+                {formatResetTime(usageStats.resetTime)}
+              </div>
               <p className="text-sm text-gray-400 mt-1">Daily at midnight UTC</p>
             </div>
           </div>

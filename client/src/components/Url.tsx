@@ -96,7 +96,7 @@ const analyzeURL = async (e: React.FormEvent) => {
         className="mb-8"
       >
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/home')}
           className="group flex items-center space-x-2 text-emerald-400 hover:text-emerald-300 transition-colors mb-6"
         >
           <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
