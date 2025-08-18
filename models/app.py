@@ -13,7 +13,7 @@ with open("pickle/new_model.pkl", "rb") as file:
     gbc = pickle.load(file)
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])
+CORS(app)
 
 
 @app.route("/", methods=["GET", "POST"])

@@ -12,7 +12,7 @@ public class CorsGlobalConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:5173"); // Your frontend
+        config.addAllowedOrigin("http://localhost:5173"); 
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 

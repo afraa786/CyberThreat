@@ -1,60 +1,75 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-// import ThreatReportApp from "./components/ThreatReportApp.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.tsx";
-import Signup from "./components/Signup.tsx";
+import AuthPage from "./components/AuthPage.tsx"; // Our consolidated auth component
 import ThreatReport from "./components/ThreatReportApp.tsx";
-import Chatbot from "./components/Chatbot";   // Import chatbot
+import Chatbot from "./components/Chatbot";
 import Url from "./components/Url.tsx";
 import Token from "./components/Tokens.tsx";
-import Loginform from "./components/loginform.tsx";
 import FAQs from "./pages/FAQs.tsx";
 import "./index.css";
-import { LoginRequest } from "./types/index.ts";
 import ThreatReportApp from "./components/ThreatReportApp.tsx";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 const router = createBrowserRouter([
   {
-    path: "/threat",
-    element: <ThreatReport />,
+    path: "/",
+    element: <AuthPage />,
   },
   {
     path: "/home",
-    element: <App />,
+    element: (
+      <ProtectedRoute>
+        <App />
+      </ProtectedRoute>
+    ),
   },
   {
-    path: "/",
-    element: <Signup />,
+    path: "/threat",
+    element: (
+      <ProtectedRoute>
+        <ThreatReport />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/chatbot",
-    element: <Chatbot />,     // Add chatbot route here
+    element: (
+      <ProtectedRoute>
+        <Chatbot />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/url",
-    element: <Url />,
+    element: (
+      <ProtectedRoute>
+        <Url />
+      </ProtectedRoute>
+    ),
   },
   {
-    path : "/token",
-    element: <Token />,
+    path: "/token",
+    element: (
+      <ProtectedRoute>
+        <Token />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:"/faqs",
-    element: <FAQs />,
+    path: "/faqs",
+    element: <FAQs />, // FAQs can remain public
   },
-  
   {
-    path: "/community",
-    element: <Loginform onLogin={function (loginData: LoginRequest): Promise<void> {
-      throw new Error("Function not implemented.");
-    } } isLoading={false} error={null} />,
+    path: "/threatsnitch",
+    element: (
+      <ProtectedRoute>
+        <ThreatReportApp />
+      </ProtectedRoute>
+    ),
   },
-  
-  {
-    path : "/threatsnitch",
-    element: <ThreatReportApp />, 
-  },
+  // No need for separate verify route since it's handled in AuthPage
 ]);
 
 createRoot(document.getElementById("root")!).render(

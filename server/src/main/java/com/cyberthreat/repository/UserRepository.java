@@ -1,11 +1,14 @@
 package com.cyberthreat.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import com.cyberthreat.model.Users;
+
+import com.cyberthreat.model.User;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<Users, Long> {
-   Optional<Users> findByEmail(String email);
-
-
+@Repository
+public interface UserRepository extends CrudRepository<User, Long> {
+    Optional<User> findByEmail(String email);
+    Optional<User> findByVerificationCode(String verificationCode);
 }

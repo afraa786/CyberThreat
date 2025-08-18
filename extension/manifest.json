@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "CyberThreat ML Scanner",
+  "version": "1.0",
+  "description": "Scans visited URLs in real-time using your ML /predict endpoint.",
+  "permissions": [
+    "tabs",
+    "notifications",
+    "scripting",
+    "alarms"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "http://127.0.0.1:5000/predict"
+  ],
+  "icons": {
+    "16": "icons/safe.png",
+    "48": "icons/safe.png",
+    "128": "icons/safe.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/safe.png",
+      "48": "icons/safe.png",
+      "128": "icons/safe.png"
+    }
+  }
+}
