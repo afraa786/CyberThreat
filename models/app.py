@@ -5,7 +5,6 @@ import warnings
 from feature import FeatureExtraction
 from flask_cors import CORS
 
-# Suppress warnings
 warnings.filterwarnings('ignore')
 
 # Load ML model

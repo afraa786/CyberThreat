@@ -11,6 +11,7 @@ import time
 from dateutil.parser import parse as date_parse
 from urllib.parse import urlparse
 
+
 class FeatureExtraction:
     features = []
     def __init__(self,url):
@@ -484,6 +485,6 @@ class FeatureExtraction:
             return 1
         except:
             return 1
-    
+        
     def getFeaturesList(self):
         return self.features
