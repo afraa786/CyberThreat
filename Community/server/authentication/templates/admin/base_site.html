@@ -1,0 +1,74 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrahead %}
+<style>
+/* Navbar gradient with default Django blue */
+#header {
+    background: var(--header-bg); /* original admin blue */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    height: 50px; /* reduced height */
+}
+
+/* Logo instead of text */
+#header #branding h1 {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+#header h1 {
+    color: #61ce70; /* gold color for the title */
+    font-weight: 600; /* slightly bolder */
+}
+
+#header #branding h1 img {
+    height: 30px; /* smaller logo */
+    margin-right: 10px;
+    border-radius: 0; /* remove background/border */
+    background: none; /* remove bg */
+    transition: transform 0.2s ease;
+}
+
+#header #branding h1 img:hover {
+    transform: scale(1.1);
+}
+
+/* Navbar links hover effect */
+#header #user-tools a {
+    color: #fff;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+#header #user-tools a:hover {
+    color: #ffd700; /* subtle golden hover */
+}
+
+/* Optional: subtle hover effect for header background */
+#header:hover {
+    background: linear-gradient(90deg, #1a73e8, #4A90E2);
+}
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="branding">
+    <img src="{% static 'authentication/logo.png' %}" alt="Logo"> Administrator
+</h1>
+{% endblock %}
+
+{% block footer %}
+<div style="display: flex; align-items: center; justify-content: center; padding: 12px 0; 
+            background: #121212; border-top: 1px solid var(--header-bg);">
+    <img src="https://crodlin.in/logo.png" alt="Crodlin Logo" style="height: 28px; margin-right: 10px;">
+    <span style="color: #ffffff; font-weight: bold; font-size: 14px;">
+        This inventory system is proudly made by 
+        <a href="https://crodlin.in" target="_blank" style="color: #A3CEF1; text-decoration: none;">Crodlin Technology</a>
+    </span>
+</div>
+{% endblock %}
