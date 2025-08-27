@@ -1,354 +1,318 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  ChevronDown,
-  ChevronUp,
-  Shield,
+import React, { useState } from 'react';
+import { Navibar } from '../components/navbar';
+import { 
+  HelpCircle, 
+  ChevronDown, 
+  ChevronUp, 
+  Shield, 
+  Zap, 
+  Globe, 
+  Key,
+  AlertTriangle,
+  CheckCircle,
+  Search,
+  MessageCircle,
+  Mail,
+  ExternalLink,
   Users,
-  Zap,
   Target,
   Award,
-  Globe,
   Bell,
-  Lock,
-  ArrowLeft,
-  Mail,
-} from "lucide-react";
+  Lock
+} from 'lucide-react';
 
-const FAQsPage = () => {
+interface FAQ {
+  id: number;
+  icon: React.ReactNode;
+  category: string;
+  question: string;
+  answer: string;
+}
+
+const FAQsPage: React.FC = () => {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const faqData = [
+  const faqData: FAQ[] = [
     {
       id: 1,
       icon: <Shield className="w-5 h-5" />,
       category: "Threat Reporting",
       question: "How do I report a cyber threat?",
-      answer:
-        "Simply navigate to the threat reporting section, select the type of threat (phishing URL, malware, suspicious activity), provide the details, and submit. Our AI assistant will analyze and categorize the threat in real-time.",
+      answer: "Simply navigate to the threat reporting section, select the type of threat (phishing URL, malware, suspicious activity), provide the details, and submit. Our AI assistant will analyze and categorize the threat in real-time."
     },
     {
       id: 2,
       icon: <Zap className="w-5 h-5" />,
       category: "Threat Reporting",
       question: "What types of threats can I report?",
-      answer:
-        "You can report phishing URLs, malware samples, suspicious emails, fraudulent websites, social engineering attempts, data breaches, and any other cybersecurity incidents. Our AI categorizes and validates each report.",
+      answer: "You can report phishing URLs, malware samples, suspicious emails, fraudulent websites, social engineering attempts, data breaches, and any other cybersecurity incidents. Our AI categorizes and validates each report."
     },
     {
       id: 3,
       icon: <Lock className="w-5 h-5" />,
       category: "Security",
       question: "How secure is my data on CyberThreat?",
-      answer:
-        "We implement JWT-based authentication for secure API access, end-to-end encryption for sensitive data, and follow industry-standard security protocols. Your personal information is never shared without consent.",
+      answer: "We implement JWT-based authentication for secure API access, end-to-end encryption for sensitive data, and follow industry-standard security protocols. Your personal information is never shared without consent."
     },
     {
       id: 4,
       icon: <Shield className="w-5 h-5" />,
       category: "Security",
       question: "What makes the threat detection real-time?",
-      answer:
-        "We use Apache Kafka for real-time data streaming, which processes and aggregates threat intelligence as it's reported. This ensures immediate threat analysis and rapid community alerts.",
+      answer: "We use Apache Kafka for real-time data streaming, which processes and aggregates threat intelligence as it's reported. This ensures immediate threat analysis and rapid community alerts."
     },
     {
       id: 5,
       icon: <Award className="w-5 h-5" />,
       category: "Gamification",
       question: "How does the XP and badge system work?",
-      answer:
-        "You earn XP points for reporting valid threats, participating in missions, and contributing to the community. Badges are awarded for specific achievements like 'First Reporter', 'Threat Hunter', or 'Community Guardian'. Higher levels unlock exclusive features.",
+      answer: "You earn XP points for reporting valid threats, participating in missions, and contributing to the community. Badges are awarded for specific achievements like 'First Reporter', 'Threat Hunter', or 'Community Guardian'. Higher levels unlock exclusive features."
     },
     {
       id: 6,
       icon: <Target className="w-5 h-5" />,
       category: "Gamification",
       question: "What are missions and how do I participate?",
-      answer:
-        "Missions are time-limited challenges that focus on specific threat types or security objectives. They might involve identifying phishing campaigns, analyzing malware samples, or contributing to threat intelligence. Complete missions to earn bonus XP and exclusive badges.",
+      answer: "Missions are time-limited challenges that focus on specific threat types or security objectives. They might involve identifying phishing campaigns, analyzing malware samples, or contributing to threat intelligence. Complete missions to earn bonus XP and exclusive badges."
     },
     {
       id: 7,
       icon: <Users className="w-5 h-5" />,
       category: "Community",
       question: "How does the leaderboard ranking work?",
-      answer:
-        "Rankings are based on your total XP, quality of threat reports, mission completions, and community engagement. Top contributors are featured on the leaderboard and receive special recognition badges.",
+      answer: "Rankings are based on your total XP, quality of threat reports, mission completions, and community engagement. Top contributors are featured on the leaderboard and receive special recognition badges."
     },
     {
       id: 8,
       icon: <Globe className="w-5 h-5" />,
       category: "Community",
       question: "What is the Live Cyber Threat Map?",
-      answer:
-        "Our interactive map visualizes reported threats globally in real-time. You can see threat hotspots, trending attack types, and geographic distribution of cyber activities. It's updated instantly as new threats are reported.",
+      answer: "Our interactive map visualizes reported threats globally in real-time. You can see threat hotspots, trending attack types, and geographic distribution of cyber activities. It's updated instantly as new threats are reported."
     },
     {
       id: 9,
       icon: <Bell className="w-5 h-5" />,
       category: "Security",
       question: "How do real-time notifications work?",
-      answer:
-        "You'll receive instant alerts for high-priority threats, mission updates, badge achievements, and community milestones. Notifications can be customized based on your interests and threat categories you want to monitor.",
+      answer: "You'll receive instant alerts for high-priority threats, mission updates, badge achievements, and community milestones. Notifications can be customized based on your interests and threat categories you want to monitor."
     },
     {
       id: 10,
       icon: <Zap className="w-5 h-5" />,
       category: "Threat Reporting",
       question: "How does the AI assistant help with threat analysis?",
-      answer:
-        "Our intelligent AI assistant automatically analyzes reported threats, checks against known threat databases, performs URL reputation checks, and provides instant feedback on threat validity and severity levels.",
+      answer: "Our intelligent AI assistant automatically analyzes reported threats, checks against known threat databases, performs URL reputation checks, and provides instant feedback on threat validity and severity levels."
     },
+    {
+      id: 11,
+      icon: <Key className="w-5 h-5" />,
+      category: "API",
+      question: "How do I get started with the API?",
+      answer: "Getting started is simple! First, sign up for an account and navigate to the API Tokens page to generate your API key. Then, check our comprehensive API documentation for integration guides, code examples, and best practices."
+    },
+    {
+      id: 12,
+      icon: <CheckCircle className="w-5 h-5" />,
+      category: "API",
+      question: "What are the API rate limits?",
+      answer: "Free accounts have a limit of 1,000 requests per day with 5 requests per second. Premium accounts get 10,000 requests per day with 20 requests per second. Enterprise plans offer custom limits based on your needs."
+    }
   ];
 
   const categories = [
     "All",
-    "Threat Reporting",
+    "Threat Reporting", 
     "Security",
     "Gamification",
     "Community",
+    "API"
   ];
 
   const toggleFAQ = (id: number) => {
     setOpenFAQ(openFAQ === id ? null : id);
   };
 
-  const filteredFAQs =
-    selectedCategory === "All"
-      ? faqData
-      : faqData.filter((faq) => faq.category === selectedCategory);
-
-  // Updated to use navigate for home navigation - same pattern as other nav items
-  const handleBackToHome = () => {
-    navigate("/home");
-  };
+  const filteredFAQs = selectedCategory === "All" 
+    ? faqData.filter(faq => 
+        faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : faqData.filter(faq => 
+        faq.category === selectedCategory &&
+        (faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+         faq.answer.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
 
   const handleEmailContact = () => {
-    window.location.href =
-      "mailto:support@cyberthreat.com?subject=Support%20Request&body=Hello%20CyberThreat%20Team,%0D%0A%0D%0AI%20have%20a%20question%20about...";
+    window.location.href = "mailto:support@cyberthreat.com?subject=Support%20Request&body=Hello%20CyberThreat%20Team,%0D%0A%0D%0AI%20have%20a%20question%20about...";
   };
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-          @keyframes grid-move {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-          }
-          
-          @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-          }
-          
-          @keyframes fadeInUp {
-            0% {
-              opacity: 0;
-              transform: translateY(30px);
-            }
-            100% {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          
-          .grid-background {
-            background-image: 
-              linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: grid-move 20s linear infinite;
-          }
-          
-          .floating-dot {
-            animation: float ease-in-out infinite;
-          }
-          
-          .fade-in-up {
-            animation: fadeInUp 0.6s ease-out both;
-          }
-        `,
-        }}
-      />
-
-      <div className="fixed inset-0">
-        <div className="absolute inset-0 opacity-20 grid-background" />
-
-        <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-green-400 rounded-full opacity-30 floating-dot"
-              style={
-                {
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDuration: `${3 + Math.random() * 4}s`,
-                  animationDelay: `${Math.random() * 2}s`,
-                } as React.CSSProperties
-              }
-            />
-          ))}
+    <div className="container mx-auto p-4 md:p-8">
+      <Navibar />
+      
+      {/* Header */}
+      <div className="mb-12">
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="relative">
+            <HelpCircle className="h-8 w-8 text-emerald-400" />
+            <div className="absolute -top-1 -right-1 h-3 w-3 bg-emerald-400 rounded-full animate-pulse" />
+          </div>
+          <h1 className="text-4xl font-bold text-neutral-100">Frequently Asked Questions</h1>
         </div>
-
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/5 rounded-full blur-3xl animate-pulse"></div>
-        <div
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-green-400/5 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: "2s" }}
-        ></div>
+        
+        <p className="text-neutral-400 text-xl leading-relaxed max-w-4xl">
+          Get answers to common questions about our cybersecurity platform, threat reporting system, 
+          API integration, and community features.
+        </p>
       </div>
 
-      <div className="relative z-10">
-        <div className="container mx-auto px-6 pt-8">
-          <button
-            onClick={handleBackToHome}
-            className="group flex items-center space-x-3 text-green-400 hover:text-green-300 transition-all duration-300 mb-8"
-          >
+      {/* Search Bar */}
+      <div className="mb-8">
+        <div className="relative max-w-2xl mx-auto rounded-2xl bg-neutral-800/50 p-8 backdrop-blur-sm border border-neutral-700/50 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center space-x-3 mb-4">
+              <Search className="h-5 w-5 text-emerald-400" />
+              <h3 className="text-lg font-semibold text-neutral-100">Search FAQs</h3>
+            </div>
+            
             <div className="relative">
-              <div className="absolute inset-0 bg-green-500/20 rounded-full blur-md group-hover:blur-lg transition-all duration-300"></div>
-              <div className="relative w-10 h-10 bg-green-500/20 border border-green-500/50 rounded-full flex items-center justify-center group-hover:bg-green-500/30 group-hover:border-green-400/70 transition-all duration-300">
-                <ArrowLeft className="w-5 h-5" />
-              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search for questions or topics..."
+                className="w-full px-4 py-3 bg-neutral-900/50 border border-neutral-600 rounded-xl text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400 transition-all duration-300"
+              />
+              <Search className="absolute right-4 top-3 h-5 w-5 text-neutral-500" />
             </div>
-            <span className="font-semibold text-lg">Back to Home</span>
-          </button>
+          </div>
         </div>
+      </div>
 
-        <div className="container mx-auto px-6 py-8">
-          <div className="text-center mb-16 relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-5xl font-bold bg-gradient-to-r from-green-400 via-green-300 to-green-500 bg-clip-text text-transparent blur-sm opacity-50">
-                FREQUENTLY ASKED QUESTIONS
-              </div>
-            </div>
-            <h1 className="relative text-5xl font-bold mb-6 bg-gradient-to-r from-green-400 via-green-300 to-green-500 bg-clip-text text-transparent">
-              FREQUENTLY ASKED QUESTIONS
-            </h1>
-
-            <div className="relative w-32 h-1 mx-auto mb-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400 to-transparent blur-sm"></div>
-              <div className="relative w-full h-full bg-gradient-to-r from-transparent via-green-400 to-transparent"></div>
-            </div>
-
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Get answers to common questions about CyberThreat's advanced
-              security features, threat reporting system, and community-driven
-              cybersecurity platform.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-4 mb-16">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`relative group px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                  selectedCategory === category
-                    ? "bg-green-500/30 border-green-400/70 text-green-300 shadow-lg shadow-green-500/20"
-                    : "bg-gray-900/60 border-green-500/30 text-green-400 hover:bg-green-500/20 hover:border-green-400/60"
-                } border backdrop-blur-sm`}
-              >
-                {selectedCategory === category && (
-                  <div className="absolute inset-0 bg-green-500/20 rounded-lg blur-md animate-pulse"></div>
-                )}
-                <span className="relative z-10">{category}</span>
-
-                <span className="relative z-10 ml-2 text-xs bg-green-500/20 px-2 py-1 rounded-full">
-                  {category === "All"
-                    ? faqData.length
-                    : faqData.filter((faq) => faq.category === category).length}
+      {/* Category Filters */}
+      <div className="mb-8">
+        <div className="flex flex-wrap justify-center gap-4">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`relative group px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 backdrop-blur-sm ${
+                selectedCategory === category
+                  ? "bg-emerald-500/20 border-emerald-400/70 text-emerald-300 shadow-lg shadow-emerald-500/20"
+                  : "bg-neutral-800/50 border-neutral-700/50 text-neutral-300 hover:bg-emerald-500/10 hover:border-emerald-400/30"
+              } border`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-xl"></div>
+              <span className="relative z-10 flex items-center space-x-2">
+                <span>{category}</span>
+                <span className="text-xs bg-emerald-500/20 px-2 py-1 rounded-full">
+                  {category === "All" 
+                    ? faqData.length 
+                    : faqData.filter((faq) => faq.category === category).length
+                  }
                 </span>
-              </button>
-            ))}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* FAQ List */}
+      <div className="max-w-4xl mx-auto space-y-6 mb-12">
+        {filteredFAQs.length === 0 ? (
+          <div className="text-center py-12">
+            <MessageCircle className="h-16 w-16 text-neutral-500 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-neutral-300 mb-2">No FAQs found</h3>
+            <p className="text-neutral-400">Try adjusting your search terms or category filter.</p>
           </div>
-
-          <div className="max-w-4xl mx-auto space-y-6">
-            {filteredFAQs.map((faq, index) => (
-              <div
-                key={faq.id}
-                className="relative group fade-in-up"
-                style={
-                  {
-                    animationDelay: `${index * 0.1}s`,
-                  } as React.CSSProperties
-                }
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-green-400/5 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-
-                <div className="relative bg-gray-900/40 backdrop-blur-md border border-green-500/20 rounded-xl overflow-hidden hover:border-green-400/50 transition-all duration-500 hover:shadow-2xl hover:shadow-green-500/10">
-                  <button
-                    onClick={() => toggleFAQ(faq.id)}
-                    className="w-full p-6 text-left flex items-center justify-between group/button hover:bg-green-500/5 transition-all duration-300"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="relative flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-green-400 group-hover/button:text-green-300 transition-all duration-300">
-                        <div className="absolute inset-0 bg-green-500/20 rounded-lg blur-sm group-hover/button:blur-md group-hover/button:bg-green-500/30 transition-all duration-300"></div>
-                        <div className="relative z-10">{faq.icon}</div>
+        ) : (
+          filteredFAQs.map((faq, index) => (
+            <div
+              key={faq.id}
+              className="relative rounded-2xl bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50 shadow-2xl overflow-hidden"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
+              
+              <div className="relative z-10">
+                <button
+                  onClick={() => toggleFAQ(faq.id)}
+                  className="w-full p-6 text-left flex items-center justify-between group hover:bg-emerald-500/5 transition-all duration-300"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="relative flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-emerald-400 group-hover:text-emerald-300 transition-all duration-300">
+                      <div className="absolute inset-0 bg-emerald-500/20 rounded-lg blur-sm group-hover:blur-md group-hover:bg-emerald-500/30 transition-all duration-300"></div>
+                      <div className="relative z-10">{faq.icon}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-emerald-400 font-medium mb-1 group-hover:text-emerald-300 transition-colors duration-300">
+                        {faq.category}
                       </div>
-                      <div>
-                        <div className="text-sm text-green-400 font-medium mb-1 group-hover/button:text-green-300 transition-colors duration-300">
-                          {faq.category}
-                        </div>
-                        <div className="text-lg font-semibold text-white group-hover/button:text-green-100 transition-colors duration-300">
-                          {faq.question}
-                        </div>
+                      <div className="text-lg font-semibold text-neutral-100 group-hover:text-emerald-50 transition-colors duration-300">
+                        {faq.question}
                       </div>
                     </div>
-                    <div className="flex-shrink-0 text-green-400 transform transition-all duration-300 group-hover/button:text-green-300 group-hover/button:scale-110">
-                      {openFAQ === faq.id ? (
-                        <ChevronUp className="w-6 h-6" />
-                      ) : (
-                        <ChevronDown className="w-6 h-6" />
-                      )}
-                    </div>
-                  </button>
+                  </div>
+                  <div className="flex-shrink-0 text-emerald-400 transform transition-all duration-300 group-hover:text-emerald-300 group-hover:scale-110">
+                    {openFAQ === faq.id ? (
+                      <ChevronUp className="w-6 h-6" />
+                    ) : (
+                      <ChevronDown className="w-6 h-6" />
+                    )}
+                  </div>
+                </button>
 
-                  <div
-                    className={`overflow-hidden transition-all duration-700 ease-in-out ${
-                      openFAQ === faq.id
-                        ? "max-h-96 opacity-100"
-                        : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    <div className="px-6 pb-6">
-                      <div className="ml-16 text-gray-300 leading-relaxed p-4 bg-green-500/5 rounded-lg border-l-2 border-green-500/30">
-                        {faq.answer}
-                      </div>
+                <div className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  openFAQ === faq.id ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                }`}>
+                  <div className="px-6 pb-6">
+                    <div className="ml-16 text-neutral-300 leading-relaxed p-4 bg-emerald-500/5 rounded-lg border-l-2 border-emerald-500/30">
+                      {faq.answer}
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))
+        )}
+      </div>
 
-          <div className="mt-16 text-center">
-            <div className="relative group max-w-2xl mx-auto">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-green-400/10 rounded-2xl blur-2xl group-hover:blur-3xl transition-all duration-700"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-green-400/5 rounded-2xl blur-xl"></div>
+      {/* Contact Section */}
+      <div className="text-center">
+        <div className="relative max-w-2xl mx-auto rounded-2xl bg-gradient-to-r from-emerald-500/10 to-emerald-400/10 p-8 backdrop-blur-sm border border-emerald-400/20 shadow-2xl">
+          <div className="relative z-10">
+            <h3 className="text-2xl font-bold text-neutral-100 mb-4">Still Have Questions?</h3>
+            <p className="text-neutral-300 mb-6 max-w-xl mx-auto">
+              Contact our security experts for personalized assistance with your cybersecurity needs 
+              and get detailed guidance on using our platform effectively.
+            </p>
 
-              <div className="relative bg-gray-900/60 backdrop-blur-md border border-green-500/30 rounded-2xl p-8 group-hover:border-green-400/50 transition-all duration-500">
-                <h3 className="text-2xl font-bold text-green-400 mb-4">
-                  Still Have Questions?
-                </h3>
-                <p className="text-gray-300 mb-6">
-                  Contact our security experts for personalized assistance with
-                  your cybersecurity needs.
-                </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={handleEmailContact}
+                className="group px-6 py-3 bg-emerald-500 text-black font-semibold rounded-xl hover:bg-emerald-400 transition-all duration-300 shadow-lg shadow-emerald-500/20 relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                <span className="relative flex items-center justify-center space-x-2">
+                  <Mail className="h-4 w-4" />
+                  <span>Email Support</span>
+                </span>
+              </button>
 
-                <button
-                  onClick={handleEmailContact}
-                  className="relative group/btn px-8 py-4 bg-green-500/20 border border-green-500/50 rounded-lg font-semibold text-green-400 hover:bg-green-500/30 hover:border-green-400/70 transition-all duration-300 transform hover:scale-105 flex items-center space-x-3 mx-auto"
-                >
-                  <div className="absolute inset-0 bg-green-500/10 rounded-lg blur-sm group-hover/btn:blur-md group-hover/btn:bg-green-500/20 transition-all duration-300"></div>
-                  <Mail className="relative z-10 w-5 h-5" />
-                  <span className="relative z-10">Email Support</span>
-                </button>
-              </div>
+              <button
+                onClick={() => window.location.href = '/docs'}
+                className="group px-6 py-3 border border-emerald-400 text-emerald-400 font-semibold rounded-xl hover:bg-emerald-400 hover:text-black transition-all duration-300"
+              >
+                <span className="flex items-center justify-center space-x-2">
+                  <ExternalLink className="h-4 w-4" />
+                  <span>API Documentation</span>
+                </span>
+              </button>
             </div>
           </div>
         </div>

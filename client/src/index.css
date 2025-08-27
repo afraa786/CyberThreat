@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "dpk_cursor/dpkCursor.min.css";
 
 ::-webkit-scrollbar {
   display: none;
@@ -60,4 +61,34 @@ p{
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.typewriter {
+  display: inline-block;
+  color: #4ade80; 
+  overflow: hidden;
+  border-right: 2px solid #4ade80; 
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  animation: typing 10s steps(6, end) infinite, 
+  blink 0.7s step-end infinite;
+}
+
+/* 10s total cycle:
+   - 0–20% (2s): typing "Securo" fast
+   - 20–70% (5s): pause (word stays visible)
+   - 70–90% (2s): backspacing faster
+   - 90–100% (1s): idle before restart
+*/
+@keyframes typing {
+  0%   { width: 0ch; }
+  10%  { width: 6ch; }   /* typed out */
+  50%  { width: 6ch; }   /* pause */
+  70%  { width: 0ch; }   /* backspace */
+  100% { width: 0ch; }
+}
+
+@keyframes blink {
+  from, to { border-color: transparent }
+  50% { border-color: #4ade80 }
 }

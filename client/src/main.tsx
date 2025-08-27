@@ -7,11 +7,13 @@ import ThreatReport from "./components/ThreatReportApp.tsx";
 import Chatbot from "./components/Chatbot";
 import Url from "./components/Url.tsx";
 import Token from "./components/Tokens.tsx";
+import Docs from "./components/Docs.tsx"; 
 import FAQs from "./pages/FAQs.tsx";
 import "./index.css";
 import ThreatReportApp from "./components/ThreatReportApp.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import WiChainDashboard from "./components/scan.tsx";
+import Profile from "./pages/Profile.tsx";
 
 const router = createBrowserRouter([
   {
@@ -68,14 +70,30 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/docs",
+    element: (
+      <ProtectedRoute>
+        <Docs />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/faqs",
-    element: <FAQs />, // FAQs can remain public
+    element: <FAQs />, 
   },
   {
     path: "/threatsnitch",
     element: (
       <ProtectedRoute>
         <ThreatReportApp />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/profile", // 
+    element: (
+      <ProtectedRoute>
+        <Profile />
       </ProtectedRoute>
     ),
   },

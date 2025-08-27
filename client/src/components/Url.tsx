@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import {Navibar} from './navbar';
 import { ArrowLeft, Shield, AlertTriangle, ExternalLink, Search, Lock, Unlock, Globe, Clock, CheckCircle, XCircle } from 'lucide-react';
 
 interface AnalysisResult {
@@ -89,19 +90,20 @@ const analyzeURL = async (e: React.FormEvent) => {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
+      <Navibar/>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <button
+        {/* <button
           onClick={() => navigate('/home')}
           className="group flex items-center space-x-2 text-emerald-400 hover:text-emerald-300 transition-colors mb-6"
         >
           <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
           <span>Back to Dashboard</span>
-        </button>
+        </button> */}
         
         <div className="flex items-center space-x-3 mb-4">
           <div className="relative">

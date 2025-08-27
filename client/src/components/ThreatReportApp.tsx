@@ -1,9 +1,12 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
+import {Navibar} from './navbar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileText, 
   Calendar, 
   Shield, 
+  Terminal as TerminalIcon,
   MapPin, 
   Info, 
   Clock, 
@@ -13,23 +16,16 @@ import {
   ChevronRight,
   ChevronLeft,
   AlertTriangle,
-  Send
+  Send,
+  Home,
+  CheckCircle,
+  Activity
 } from 'lucide-react';
 
-import ParticlesBackground from './ParticlesBackground';
-import ThreatLevelMeter from './ThreatLevelMeter';
-import UserProgress from './UserProgress';
-import IntroSection from './IntroSection';
-import ThreatTypeCard from './ThreatTypeCard';
-import FormStep from './FormStep';
-import ConfirmationScreen from './ConfirmationScreen';
-import { useNavigate } from 'react-router-dom';
+const ThreatReportApp = () => {
 
-import { ThreatFormData, ThreatType, UserProgress as UserProgressType, ValidationError, SubmissionResult } from '../types';
-
-const ThreatReportApp: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<ThreatFormData>({
+  const [formData, setFormData] = useState({
     threatDetails: '',
     threatDate: '',
     threatType: '',
@@ -41,22 +37,16 @@ const ThreatReportApp: React.FC = () => {
     firstStep: ''
   });
   
-  const [errors, setErrors] = useState<ValidationError[]>([]);
+  const [errors, setErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null);
+  const [submissionResult, setSubmissionResult] = useState(null);
   const [showIntro, setShowIntro] = useState(true);
   
-  // Mock data for demonstration
+  // Mock data
   const [threatLevel] = useState(67);
   const [recentReports] = useState(1247);
-  const [userProgress] = useState<UserProgressType>({
-    level: 5,
-    xp: 450,
-    badges: ['first-report', 'defender'],
-    reportsSubmitted: 12
-  });
 
-  const threatTypes: ThreatType[] = [
+  const threatTypes = [
     {
       id: 'phishing',
       name: 'Phishing',
@@ -92,7 +82,7 @@ const ThreatReportApp: React.FC = () => {
     {
       id: 'ddos',
       name: 'DDoS Attack',
-      description: 'Distributed denial-of-service attack overwhelming servers',
+      description: 'Distributed denial-of-service attacks overwhelming servers',
       example: 'Website becomes unavailable due to traffic flood',
       severity: 'high',
       icon: '⚡'
@@ -134,8 +124,8 @@ const ThreatReportApp: React.FC = () => {
     { id: 9, title: 'First Steps', icon: Footprints, description: 'What was your immediate response?' }
   ];
 
-  const validateStep = (stepIndex: number): ValidationError[] => {
-    const newErrors: ValidationError[] = [];
+  const validateStep = (stepIndex) => {
+    const newErrors = [];
     
     switch (stepIndex) {
       case 0:
@@ -182,10 +172,9 @@ const ThreatReportApp: React.FC = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    const result: SubmissionResult = {
+    const result = {
       success: true,
       reportId: `TR-${Date.now().toString(36).toUpperCase()}`,
       message: 'Your threat report has been successfully submitted to our security team.',
@@ -219,93 +208,198 @@ const ThreatReportApp: React.FC = () => {
     setShowIntro(true);
   };
 
-  const getFieldError = (field: string) => {
+  const getFieldError = (field) => {
     return errors.find(error => error.field === field);
   };
 
+  const BackToHomeButton = () => (
+    <div className="absolute top-6 left-6 z-50">
+      <button
+        onClick={() => window.history.back()}
+        className="group flex items-center space-x-3 text-gray-400 hover:text-white transition-all duration-300"
+        title="Back to Home"
+      >
+        <div className="relative">
+          <div className="w-10 h-10 bg-gray-800/80 border border-gray-700 rounded-lg flex items-center justify-center group-hover:bg-gray-700/80 group-hover:border-gray-600 transition-all duration-300">
+            <ChevronLeft className="w-5 h-5" />
+          </div>
+        </div>
+        <span className="font-medium text-sm tracking-wide">Back to Home</span>
+      </button>
+    </div>
+  );
+
+  const ThreatLevelIndicator = () => (
+    <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 mb-6">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-white">Current Threat Level</h3>
+        <Activity className="w-4 h-4 text-emerald-400" />
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="flex-1 bg-gray-700 rounded-lg h-2">
+          <div 
+            className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-lg transition-all duration-300"
+            style={{ width: `${threatLevel}%` }}
+          />
+        </div>
+        <span className="text-emerald-400 text-sm font-medium">{threatLevel}%</span>
+      </div>
+      <p className="text-gray-400 text-xs mt-2">{recentReports.toLocaleString()} reports analyzed today</p>
+    </div>
+  );
+
+  const ProgressSteps = () => (
+    <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
+      <h3 className="text-sm font-semibold text-white mb-4">Progress</h3>
+      <div className="space-y-2">
+        {steps.map((step, index) => (
+          <div
+            key={step.id}
+            className={`flex items-center space-x-3 p-2 rounded-lg transition-all duration-300 cursor-pointer ${
+              currentStep === index 
+                ? 'bg-emerald-500/20 border border-emerald-500/30' 
+                : currentStep > index 
+                ? 'bg-emerald-500/10 text-emerald-400' 
+                : 'text-gray-400 hover:bg-gray-700/50'
+            }`}
+            onClick={() => setCurrentStep(index)}
+          >
+            <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs ${
+              currentStep === index 
+                ? 'bg-emerald-500 text-white' 
+                : currentStep > index 
+                ? 'bg-emerald-500 text-white' 
+                : 'bg-gray-700 text-gray-400'
+            }`}>
+              {currentStep > index ? <CheckCircle className="w-3 h-3" /> : index + 1}
+            </div>
+            <span className="text-sm font-medium">{step.title}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const ThreatTypeCard = ({ threatType, isSelected, onSelect }) => (
+    <motion.button
+      onClick={() => onSelect(threatType)}
+      className={`p-4 rounded-lg border-2 text-left transition-all duration-300 ${
+        isSelected
+          ? 'border-emerald-500 bg-emerald-500/10 text-white'
+          : 'border-gray-700 bg-gray-800/50 text-gray-300 hover:border-gray-600 hover:bg-gray-800/70'
+      }`}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <div className="flex items-center space-x-3 mb-2">
+        <span className="text-lg">{threatType.icon}</span>
+        <span className="font-semibold text-sm">{threatType.name}</span>
+      </div>
+      <p className="text-xs text-gray-400 leading-relaxed">{threatType.description}</p>
+    </motion.button>
+  );
+
+  const IntroSection = () => (
+    <div className="text-center mb-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-6"
+      >
+        <h2 className="text-3xl font-bold text-white mb-4">Report a Cyber Threat</h2>
+        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          Help protect others by reporting suspicious activities, scams, and cyber threats. 
+          Your report helps us strengthen our defenses and keep everyone safe.
+        </p>
+      </motion.div>
+      
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+          <Shield className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
+          <h3 className="font-semibold text-white mb-2">Secure Reporting</h3>
+          <p className="text-gray-400 text-sm">All reports are encrypted and handled confidentially</p>
+        </div>
+        
+        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+          <Activity className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
+          <h3 className="font-semibold text-white mb-2">Real-time Analysis</h3>
+          <p className="text-gray-400 text-sm">Threats are analyzed immediately by our security team</p>
+        </div>
+        
+        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+          <CheckCircle className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
+          <h3 className="font-semibold text-white mb-2">Community Protection</h3>
+          <p className="text-gray-400 text-sm">Help protect others from similar threats</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ConfirmationScreen = () => (
+    <div className="max-w-2xl mx-auto text-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-gray-800/50 border border-gray-700 rounded-lg p-8"
+      >
+        <div className="w-16 h-16 bg-emerald-500/20 rounded-lg flex items-center justify-center mx-auto mb-6">
+          <CheckCircle className="w-8 h-8 text-emerald-400" />
+        </div>
+        
+        <h2 className="text-2xl font-bold text-white mb-4">Report Submitted Successfully</h2>
+        <p className="text-gray-400 mb-6">{submissionResult.message}</p>
+        
+        <div className="bg-gray-700/50 rounded-lg p-4 mb-6">
+          <p className="text-emerald-400 font-medium mb-2">Report ID: {submissionResult.reportId}</p>
+          <p className="text-gray-400 text-sm">Save this ID for future reference</p>
+        </div>
+        
+        <div className="text-left mb-8">
+          <h3 className="text-white font-semibold mb-3">What happens next:</h3>
+          <ul className="space-y-2">
+            {submissionResult.nextSteps.map((step, index) => (
+              <li key={index} className="flex items-start space-x-2 text-gray-400">
+                <span className="text-emerald-400 mt-1">•</span>
+                <span className="text-sm">{step}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        <button
+          onClick={resetForm}
+          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300"
+        >
+          Report Another Threat
+        </button>
+      </motion.div>
+    </div>
+  );
+
   if (submissionResult) {
     return (
-      <div className="min-h-screen bg-black text-white relative overflow-hidden">
-        <ParticlesBackground />
-        <div className="relative z-10 container mx-auto px-4 py-8">
-          <ConfirmationScreen
-            formData={formData}
-            result={submissionResult}
-            onReportAnother={resetForm}
-          />
+      <div className="min-h-screen bg-gray-900 text-white">
+        <BackToHomeButton />
+        <div className="container mx-auto px-6 py-16">
+          <ConfirmationScreen />
         </div>
       </div>
     );
   }
 
-  function handleBack(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    event.preventDefault();
-    setShowIntro(true);
-    setCurrentStep(0);
-    setErrors([]);
-  }
-
-return (
-  <div className="min-h-screen bg-black text-white relative overflow-hidden">
-    <ParticlesBackground />
-    <BackToHomeButton />
-
+  return (
+    <div className="min-h-screen bg-neutral-900 text-white">
       
       {/* Header */}
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 bg-black/90 backdrop-blur-sm border-b border-cyan-500/30 p-6"
-      >
-        <div className="container mx-auto">
-          <motion.h1
-            className="text-4xl font-orbitron font-bold text-center"
-            animate={{ 
-              textShadow: [
-                "0 0 10px #00ffff", 
-                "0 0 20px #00ffff", 
-                "0 0 10px #00ffff"
-              ] 
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              CYBER THREAT REPORT
-            </span>
-          </motion.h1>
-          <p className="text-center text-cyan-300 font-mono mt-2">
-            Neural Defense Network • Threat Intelligence Division
-          </p>
-        </div>
-      </motion.header>
+      
+      <Navibar/>
 
-      <div className="relative z-10 container mx-auto px-4 py-8">
+      <div className="container mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-4 gap-8">
-
           
-          {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            <ThreatLevelMeter level={threatLevel} recentReports={recentReports} />
-            <UserProgress progress={userProgress} />
-            
-            {/* Progress Steps */}
-            <div className="bg-black/80 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-4">
-              <h3 className="text-lg font-orbitron font-bold text-cyan-400 mb-4">
-                PROGRESS
-              </h3>
-              <div className="space-y-2">
-                {steps.map((step, index) => (
-                  <FormStep
-                    key={step.id}
-                    step={index + 1}
-                    title={step.title}
-                    isActive={currentStep === index}
-                    isCompleted={currentStep > index}
-                    onClick={() => setCurrentStep(index)}
-                  />
-                ))}
-              </div>
-            </div>
+            <ThreatLevelIndicator />
+            <ProgressSteps />
           </div>
 
           {/* Main Content */}
@@ -323,11 +417,11 @@ return (
                   <div className="text-center">
                     <motion.button
                       onClick={() => setShowIntro(false)}
-                      className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-orbitron font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 mx-auto"
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 px-8 rounded-lg transition-all duration-300 inline-flex items-center space-x-2"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <span>BEGIN THREAT REPORT</span>
+                      <span>Start Report</span>
                       <ChevronRight className="w-5 h-5" />
                     </motion.button>
                   </div>
@@ -341,42 +435,41 @@ return (
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-black/80 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8"
+                  className="bg-gray-800/50 border border-gray-700 rounded-lg p-8"
                 >
                   <div className="mb-6">
                     <div className="flex items-center space-x-3 mb-4">
                       {React.createElement(steps[currentStep].icon, { 
-                        className: "w-8 h-8 text-cyan-400" 
+                        className: "w-6 h-6 text-emerald-400" 
                       })}
-                      <h2 className="text-2xl font-orbitron font-bold text-cyan-400">
+                      <h2 className="text-xl font-bold text-white">
                         {steps[currentStep].title}
                       </h2>
                     </div>
-                    <p className="text-cyan-300 font-mono">
+                    <p className="text-gray-400">
                       {steps[currentStep].description}
                     </p>
                   </div>
 
-                  {/* Step Content */}
                   <div className="space-y-6">
                     {currentStep === 0 && (
                       <div>
-                        <label className="block text-sm font-mono text-cyan-400 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           Describe the threat you encountered *
                         </label>
                         <textarea
                           value={formData.threatDetails}
                           onChange={(e) => setFormData({ ...formData, threatDetails: e.target.value })}
                           placeholder="e.g., I received a suspicious email claiming to be from my bank asking me to verify my account..."
-                          className={`w-full bg-gray-900/50 border rounded-lg px-4 py-3 text-cyan-100 placeholder-cyan-500/40 font-mono focus:outline-none focus:ring-2 transition-all duration-300 ${
+                          className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
                             getFieldError('threatDetails') 
-                              ? 'border-red-500 focus:ring-red-400/20' 
-                              : 'border-cyan-500/50 focus:border-cyan-400 focus:ring-cyan-400/20'
+                              ? 'border-red-500 focus:ring-red-500/20' 
+                              : 'border-gray-600 focus:border-emerald-500 focus:ring-emerald-500/20'
                           }`}
                           rows={4}
                         />
                         {getFieldError('threatDetails') && (
-                          <p className="text-red-400 text-sm font-mono mt-1">
+                          <p className="text-red-400 text-sm mt-1">
                             {getFieldError('threatDetails')?.message}
                           </p>
                         )}
@@ -385,21 +478,21 @@ return (
 
                     {currentStep === 1 && (
                       <div>
-                        <label className="block text-sm font-mono text-cyan-400 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           When did this threat occur? *
                         </label>
                         <input
                           type="datetime-local"
                           value={formData.threatDate}
                           onChange={(e) => setFormData({ ...formData, threatDate: e.target.value })}
-                          className={`w-full bg-gray-900/50 border rounded-lg px-4 py-3 text-cyan-100 font-mono focus:outline-none focus:ring-2 transition-all duration-300 ${
+                          className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all duration-300 ${
                             getFieldError('threatDate') 
-                              ? 'border-red-500 focus:ring-red-400/20' 
-                              : 'border-cyan-500/50 focus:border-cyan-400 focus:ring-cyan-400/20'
+                              ? 'border-red-500 focus:ring-red-500/20' 
+                              : 'border-gray-600 focus:border-emerald-500 focus:ring-emerald-500/20'
                           }`}
                         />
                         {getFieldError('threatDate') && (
-                          <p className="text-red-400 text-sm font-mono mt-1">
+                          <p className="text-red-400 text-sm mt-1">
                             {getFieldError('threatDate')?.message}
                           </p>
                         )}
@@ -408,7 +501,7 @@ return (
 
                     {currentStep === 2 && (
                       <div>
-                        <label className="block text-sm font-mono text-cyan-400 mb-4">
+                        <label className="block text-sm font-medium text-gray-300 mb-4">
                           Select the type of threat *
                         </label>
                         <div className="grid md:grid-cols-2 gap-4">
@@ -424,7 +517,7 @@ return (
                           ))}
                         </div>
                         {getFieldError('threatType') && (
-                          <p className="text-red-400 text-sm font-mono mt-2">
+                          <p className="text-red-400 text-sm mt-2">
                             {getFieldError('threatType')?.message}
                           </p>
                         )}
@@ -433,7 +526,7 @@ return (
 
                     {currentStep === 3 && (
                       <div>
-                        <label className="block text-sm font-mono text-cyan-400 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           Where did you encounter this threat? *
                         </label>
                         <div className="grid md:grid-cols-2 gap-2">
@@ -441,20 +534,20 @@ return (
                             <motion.button
                               key={option.value}
                               onClick={() => setFormData({ ...formData, incidentLocation: option.value })}
-                              className={`p-3 rounded-lg border-2 text-left transition-all duration-300 ${
+                              className={`p-3 rounded-lg border text-left transition-all duration-300 ${
                                 formData.incidentLocation === option.value
-                                  ? 'border-cyan-400 bg-cyan-400/10 text-cyan-400'
-                                  : 'border-gray-600 bg-gray-800/50 text-cyan-300 hover:border-cyan-500/50'
+                                  ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
+                                  : 'border-gray-600 bg-gray-800/50 text-gray-300 hover:border-gray-500'
                               }`}
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                             >
-                              <span className="font-mono text-sm">{option.label}</span>
+                              <span className="text-sm">{option.label}</span>
                             </motion.button>
                           ))}
                         </div>
                         {getFieldError('incidentLocation') && (
-                          <p className="text-red-400 text-sm font-mono mt-2">
+                          <p className="text-red-400 text-sm mt-2">
                             {getFieldError('incidentLocation')?.message}
                           </p>
                         )}
@@ -463,14 +556,14 @@ return (
 
                     {currentStep === 4 && (
                       <div>
-                        <label className="block text-sm font-mono text-cyan-400 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           Additional information (optional)
                         </label>
                         <textarea
                           value={formData.moreInformation}
                           onChange={(e) => setFormData({ ...formData, moreInformation: e.target.value })}
                           placeholder="Any additional details that might help our security team..."
-                          className="w-full bg-gray-900/50 border border-cyan-500/50 rounded-lg px-4 py-3 text-cyan-100 placeholder-cyan-500/40 font-mono focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300"
+                          className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
                           rows={3}
                         />
                       </div>
@@ -478,14 +571,14 @@ return (
 
                     {currentStep === 5 && (
                       <div>
-                        <label className="block text-sm font-mono text-cyan-400 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           Why are you reporting this now? (optional)
                         </label>
                         <textarea
                           value={formData.delayReason}
                           onChange={(e) => setFormData({ ...formData, delayReason: e.target.value })}
                           placeholder="e.g., I just realized this was suspicious, I was busy and forgot to report it earlier..."
-                          className="w-full bg-gray-900/50 border border-cyan-500/50 rounded-lg px-4 py-3 text-cyan-100 placeholder-cyan-500/40 font-mono focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300"
+                          className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
                           rows={3}
                         />
                       </div>
@@ -493,7 +586,7 @@ return (
 
                     {currentStep === 6 && (
                       <div>
-                        <label className="block text-sm font-mono text-cyan-400 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           Suspicious URL or link (optional)
                         </label>
                         <input
@@ -501,9 +594,9 @@ return (
                           value={formData.locationUrl}
                           onChange={(e) => setFormData({ ...formData, locationUrl: e.target.value })}
                           placeholder="https://suspicious-website.com"
-                          className="w-full bg-gray-900/50 border border-cyan-500/50 rounded-lg px-4 py-3 text-cyan-100 placeholder-cyan-500/40 font-mono focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300"
+                          className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
                         />
-                        <p className="text-cyan-500/60 text-xs font-mono mt-1">
+                        <p className="text-gray-500 text-xs mt-1">
                           ⚠️ Do not click on suspicious links. Copy and paste the URL here.
                         </p>
                       </div>
@@ -511,11 +604,11 @@ return (
 
                     {currentStep === 7 && (
                       <div>
-                        <label className="block text-sm font-mono text-cyan-400 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           Upload evidence (optional)
                         </label>
-                        <div className="border-2 border-dashed border-cyan-500/50 rounded-lg p-8 text-center">
-                          <Camera className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+                        <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+                          <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                           <input
                             type="file"
                             onChange={(e) => setFormData({ ...formData, evidence: e.target.files?.[0] || null })}
@@ -525,15 +618,15 @@ return (
                           />
                           <label
                             htmlFor="evidence-upload"
-                            className="cursor-pointer text-cyan-400 font-mono hover:text-cyan-300 transition-colors"
+                            className="cursor-pointer text-emerald-400 hover:text-emerald-300 transition-colors"
                           >
                             Click to upload screenshots or documents
                           </label>
-                          <p className="text-cyan-500/60 text-xs font-mono mt-2">
+                          <p className="text-gray-500 text-xs mt-2">
                             Supported: Images, PDF, Word documents (Max 10MB)
                           </p>
                           {formData.evidence && (
-                            <p className="text-green-400 font-mono text-sm mt-2">
+                            <p className="text-emerald-400 text-sm mt-2">
                               ✓ {formData.evidence.name}
                             </p>
                           )}
@@ -543,14 +636,14 @@ return (
 
                     {currentStep === 8 && (
                       <div>
-                        <label className="block text-sm font-mono text-cyan-400 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           What was your immediate response? (optional)
                         </label>
                         <textarea
                           value={formData.firstStep}
                           onChange={(e) => setFormData({ ...formData, firstStep: e.target.value })}
                           placeholder="e.g., I closed the browser, I didn't click on anything, I changed my password..."
-                          className="w-full bg-gray-900/50 border border-cyan-500/50 rounded-lg px-4 py-3 text-cyan-100 placeholder-cyan-500/40 font-mono focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300"
+                          className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
                           rows={3}
                         />
                       </div>
@@ -558,20 +651,20 @@ return (
                   </div>
 
                   {/* Navigation */}
-                  <div className="flex justify-between items-center mt-8 pt-6 border-t border-cyan-500/30">
+                  <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-700">
                     <motion.button
                       onClick={prevStep}
                       disabled={currentStep === 0}
-                      className="flex items-center space-x-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:opacity-50 text-white font-mono rounded-lg transition-all duration-300 disabled:cursor-not-allowed"
+                      className="flex items-center space-x-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:opacity-50 text-white rounded-lg transition-all duration-300 disabled:cursor-not-allowed"
                       whileHover={{ scale: currentStep === 0 ? 1 : 1.05 }}
                       whileTap={{ scale: currentStep === 0 ? 1 : 0.95 }}
                     >
                       <ChevronLeft className="w-5 h-5" />
-                      <span>PREVIOUS</span>
+                      <span>Previous</span>
                     </motion.button>
 
                     <div className="text-center">
-                      <span className="text-cyan-400 font-mono text-sm">
+                      <span className="text-gray-400 text-sm">
                         Step {currentStep + 1} of {steps.length}
                       </span>
                     </div>
@@ -580,7 +673,7 @@ return (
                       <motion.button
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 disabled:from-gray-700 disabled:to-gray-600 text-white font-orbitron font-bold rounded-lg transition-all duration-300 disabled:cursor-not-allowed"
+                        className="flex items-center space-x-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-600 text-white font-medium rounded-lg transition-all duration-300 disabled:cursor-not-allowed"
                         whileHover={{ scale: isSubmitting ? 1 : 1.05 }}
                         whileTap={{ scale: isSubmitting ? 1 : 0.95 }}
                       >
@@ -589,25 +682,25 @@ return (
                             <motion.div
                               animate={{ rotate: 360 }}
                               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-lg"
                             />
-                            <span>SUBMITTING...</span>
+                            <span>Submitting...</span>
                           </>
                         ) : (
                           <>
                             <Send className="w-5 h-5" />
-                            <span>SUBMIT REPORT</span>
+                            <span>Submit Report</span>
                           </>
                         )}
                       </motion.button>
                     ) : (
                       <motion.button
                         onClick={nextStep}
-                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-mono rounded-lg transition-all duration-300"
+                        className="flex items-center space-x-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-all duration-300"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <span>NEXT</span>
+                        <span>Next</span>
                         <ChevronRight className="w-5 h-5" />
                       </motion.button>
                     )}
@@ -622,13 +715,13 @@ return (
                     >
                       <div className="flex items-center space-x-2 mb-2">
                         <AlertTriangle className="w-5 h-5 text-red-400" />
-                        <span className="text-red-400 font-mono font-bold">
+                        <span className="text-red-400 font-medium">
                           Please fix the following errors:
                         </span>
                       </div>
                       <ul className="space-y-1">
                         {errors.map((error, index) => (
-                          <li key={index} className="text-red-300 font-mono text-sm">
+                          <li key={index} className="text-red-300 text-sm">
                             • {error.message}
                           </li>
                         ))}
@@ -644,31 +737,5 @@ return (
     </div>
   );
 };
-
-function BackToHomeButton() {
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    navigate("/home");
-  };
-
-  return (
-    <div className="absolute top-4 left-4 z-50">
-      <button
-        onClick={handleBack}
-        className="group flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-all duration-300"
-        title="Back to Home"
-      >
-        <div className="relative">
-          <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-md group-hover:blur-lg transition-all duration-300 animate-pulse" />
-          <div className="relative w-10 h-10 bg-blue-600/20 border border-blue-500 rounded-full flex items-center justify-center group-hover:bg-blue-600/30 group-hover:border-blue-400 transition-all duration-300 shadow-[0_0_12px_2px_rgba(59,130,246,0.5)]">
-            <ChevronLeft className="w-5 h-5" />
-          </div>
-        </div>
-        <span className="font-semibold text-base tracking-wide">Back to Home</span>
-      </button>
-    </div>
-  );
-}
 
 export default ThreatReportApp;

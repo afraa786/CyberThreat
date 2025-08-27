@@ -1,50 +1,23 @@
 import React, { useState, useEffect, useRef, KeyboardEvent } from 'react';
-import { Send, Zap, Shield, AlertTriangle } from 'lucide-react';
+import { Send, ArrowLeft, Bot, User, Paperclip, MoreHorizontal } from 'lucide-react';
 
 interface Message {
-  role: "system" | "user" | "assistant" | "error";
+  role: "user" | "assistant" | "error";
   content: string;
   timestamp?: Date;
 }
 
 export default function App() {
-  const [messages, setMessages] = useState<Message[]>([
-    { 
-      role: "system", 
-      content: "Hey I am AstraAi — your intelligent guardian in the digital realm, empowering you to detect, analyze, and respond to cyber threats with real-time insights and smart defense. So, what is your query?",
-      timestamp: new Date()
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [conversationId] = useState(() => Date.now().toString());
   const [loading, setLoading] = useState(false);
-  const [glitchText, setGlitchText] = useState("AstraAI");
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  // Glitch effect for the title
-  useEffect(() => {
-    const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-    const originalText = "AstraAI";
-    
-    const glitchInterval = setInterval(() => {
-      if (Math.random() < 0.1) {
-        const glitched = originalText
-          .split('')
-          .map(char => Math.random() < 0.3 ? glitchChars[Math.floor(Math.random() * glitchChars.length)] : char)
-          .join('');
-        setGlitchText(glitched);
-        
-        setTimeout(() => setGlitchText(originalText), 100);
-      }
-    }, 2000);
-
-    return () => clearInterval(glitchInterval);
-  }, []);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -78,7 +51,7 @@ export default function App() {
         };
         setMessages((prev) => [...prev, botMessage]);
       } else {
-        const errorMsg = data.detail || "Neural link severed. Attempting reconnection...";
+        const errorMsg = data.detail || "Connection failed. Please try again.";
         setMessages((prev) => [
           ...prev,
           { 
@@ -93,7 +66,7 @@ export default function App() {
         ...prev,
         { 
           role: "error", 
-          content: "Network anomaly detected. Try again.",
+          content: "Network error. Please try again.",
           timestamp: new Date()
         },
       ]);
@@ -109,174 +82,199 @@ export default function App() {
     }
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour12: false, 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-  };
-
   return (
-    <div className="min-h-screen bg-black text-green-400 font-mono overflow-hidden relative">
-      {/* Animated background grid */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-purple-900/20 to-pink-900/20"></div>
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px',
-          animation: 'grid-move 20s linear infinite'
-        }}></div>
-      </div>
-
-      {/* Glitch overlay */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="w-full h-full bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent animate-pulse"></div>
-      </div>
-
-      <div className="relative z-10 max-w-4xl mx-auto p-6 flex flex-col h-screen">
-        {/* Header */}
-        <div className="mb-8 text-center relative">
-          <div className="inline-block relative">
-            <h1 className="text-5xl font-bold mb-2 bg-gradient-to-r from-cyan-400 via-green-400 to-purple-400 bg-clip-text text-transparent">
-              {glitchText}
-            </h1>
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 via-green-400 to-purple-400 rounded-lg blur opacity-25 animate-pulse"></div>
-          </div>
-          <p className="text-cyan-300 text-lg tracking-wider">
-            {'>'} CYBER_DEFENSE_PROTOCOL_INITIATED
-          </p>
-          <div className="flex justify-center items-center gap-4 mt-4">
-            <div className="flex items-center gap-2 text-green-400">
-              <Shield className="w-4 h-4 animate-pulse" />
-              <span className="text-sm">SECURE</span>
-            </div>
-            <div className="flex items-center gap-2 text-cyan-400">
-              <Zap className="w-4 h-4" />
-              <span className="text-sm">QUANTUM_LINK</span>
-            </div>
-          </div>
+    <div className="flex flex-col h-screen bg-neutral-900 text-emerald-300">
+      {/* Header */}
+      <header className="flex items-center justify-between p-4 border-b border-neutral-700/30 bg-neutral-800/50 backdrop-blur-sm">
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => (window.location.href = "/home")}
+            className="group flex items-center space-x-2 text-emerald-400 hover:text-emerald-300 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+            <span>Back to Home</span>
+          </button>
         </div>
+        
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <Bot className="h-4 w-4 text-neutral-900" />
+          </div>
+          <span className="text-emerald-200 font-medium">AstraAI</span>
+        </div>
+        
+        <button className="p-2 hover:bg-neutral-700/50 rounded-xl transition-colors">
+          <MoreHorizontal className="h-5 w-5 text-emerald-400" />
+        </button>
+      </header>
 
-        {/* Chat Messages */}
-        <div className="flex-1 overflow-y-auto mb-6 space-y-4 scrollbar-thin scrollbar-track-gray-900 scrollbar-thumb-cyan-600">
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-slide-in`}
-              style={{ animationDelay: `${idx * 0.1}s` }}
-            >
-              <div
-                className={`max-w-[80%] p-4 rounded-lg relative overflow-hidden ${
-                  msg.role === "user"
-                    ? "bg-gradient-to-r from-blue-900/80 to-purple-900/80 text-cyan-100 border border-blue-400/50"
-                    : msg.role === "assistant"
-                    ? "bg-gradient-to-r from-green-900/80 to-cyan-900/80 text-green-100 border border-green-400/50"
-                    : "bg-gradient-to-r from-orange-900/80 to-yellow-900/80 text-orange-100 border border-orange-400/50"
-                }`}
-              >
-                {/* Holographic effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer"></div>
+      {/* Main Chat Area */}
+      <main className="flex-1 overflow-hidden flex flex-col">
+        {/* Welcome Screen or Messages */}
+        <div className="flex-1 overflow-y-auto">
+          {messages.length === 0 ? (
+            /* Welcome Screen */
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/20">
+                <Bot className="h-8 w-8 text-neutral-900" />
+              </div>
+              <h1 className="text-2xl font-bold text-emerald-200 mb-4">Welcome to AstraAI</h1>
+              <p className="text-emerald-300/80 max-w-md mb-8">
+                Your intelligent guardian in the digital realm. I'm here to help you detect, analyze, and respond to cyber threats with real-time insights and smart defense.
+              </p>
+              
+              {/* Example prompts */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl w-full">
+                <button
+                  onClick={() => setInput("Analyze this suspicious email for phishing attempts")}
+                  className="p-4 text-left border border-neutral-700/50 rounded-xl hover:border-emerald-500/30 hover:bg-neutral-800/50 transition-all duration-200 text-emerald-200 backdrop-blur-sm"
+                >
+                  <div className="font-medium mb-1">Analyze suspicious emails</div>
+                  <div className="text-sm text-emerald-300/70">Check for phishing attempts</div>
+                </button>
                 
-                {/* Message content */}
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-2">
-                    {msg.role === "user" && <span className="text-xs text-cyan-300">USER</span>}
-                    {msg.role === "assistant" && <span className="text-xs text-green-300">ASTRA_AI</span>}
-                    {msg.role === "error" && <AlertTriangle className="w-4 h-4 text-orange-400" />}
-                    {msg.timestamp && (
-                      <span className="text-xs opacity-60 ml-auto">
-                        {formatTime(msg.timestamp)}
-                      </span>
-                    )}
-                  </div>
-                  <p className="leading-relaxed">{msg.content}</p>
-                </div>
-
-                {/* Glowing border effect */}
-                <div className={`absolute inset-0 rounded-lg opacity-50 ${
-                  msg.role === "user" 
-                    ? "shadow-[0_0_20px_rgba(59,130,246,0.5)]" 
-                    : msg.role === "assistant"
-                    ? "shadow-[0_0_20px_rgba(34,197,94,0.5)]"
-                    : "shadow-[0_0_20px_rgba(251,146,60,0.5)]"
-                }`}></div>
+                <button
+                  onClick={() => setInput("What are the latest cybersecurity threats I should know about?")}
+                  className="p-4 text-left border border-neutral-700/50 rounded-xl hover:border-emerald-500/30 hover:bg-neutral-800/50 transition-all duration-200 text-emerald-200 backdrop-blur-sm"
+                >
+                  <div className="font-medium mb-1">Latest security threats</div>
+                  <div className="text-sm text-emerald-300/70">Stay updated on cyber risks</div>
+                </button>
+                
+                <button
+                  onClick={() => setInput("How can I secure my network infrastructure?")}
+                  className="p-4 text-left border border-neutral-700/50 rounded-xl hover:border-emerald-500/30 hover:bg-neutral-800/50 transition-all duration-200 text-emerald-200 backdrop-blur-sm"
+                >
+                  <div className="font-medium mb-1">Network security</div>
+                  <div className="text-sm text-emerald-300/70">Protect your infrastructure</div>
+                </button>
+                
+                <button
+                  onClick={() => setInput("Explain common social engineering tactics")}
+                  className="p-4 text-left border border-neutral-700/50 rounded-xl hover:border-emerald-500/30 hover:bg-neutral-800/50 transition-all duration-200 text-emerald-200 backdrop-blur-sm"
+                >
+                  <div className="font-medium mb-1">Social engineering</div>
+                  <div className="text-sm text-emerald-300/70">Learn about common tactics</div>
+                </button>
               </div>
             </div>
-          ))}
-          
-          {loading && (
-            <div className="flex justify-start animate-slide-in">
-              <div className="bg-gradient-to-r from-green-900/80 to-cyan-900/80 text-green-100 border border-green-400/50 p-4 rounded-lg relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer"></div>
-                <div className="relative z-10 flex items-center gap-3">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+          ) : (
+            /* Messages */
+            <div className="px-4 py-6 max-w-4xl mx-auto w-full space-y-6">
+              {messages.map((msg, idx) => (
+                <div key={idx} className="flex gap-4 animate-fade-in">
+                  <div className="flex-shrink-0">
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shadow-sm ${
+                      msg.role === "user" 
+                        ? "bg-emerald-600" 
+                        : msg.role === "assistant"
+                        ? "bg-gradient-to-br from-emerald-400 to-emerald-600"
+                        : "bg-red-600"
+                    }`}>
+                      {msg.role === "user" ? (
+                        <User className="h-4 w-4 text-neutral-900" />
+                      ) : msg.role === "assistant" ? (
+                        <Bot className="h-4 w-4 text-neutral-900" />
+                      ) : (
+                        <span className="text-xs text-white">!</span>
+                      )}
+                    </div>
                   </div>
-                  <span className="text-sm">PROCESSING_NEURAL_PATTERNS...</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="mb-1">
+                      <span className="text-sm font-medium text-emerald-200">
+                        {msg.role === "user" ? "You" : msg.role === "assistant" ? "AstraAI" : "System"}
+                      </span>
+                    </div>
+                    <div className="prose prose-emerald max-w-none">
+                      <div className={`text-emerald-100 whitespace-pre-wrap leading-relaxed ${
+                        msg.role === "error" ? "text-red-300" : ""
+                      }`}>
+                        {msg.content}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
+              
+              {loading && (
+                <div className="flex gap-4 animate-fade-in">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm">
+                      <Bot className="h-4 w-4 text-neutral-900" />
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="mb-1">
+                      <span className="text-sm font-medium text-emerald-200">AstraAI</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-emerald-300">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                      <span className="text-sm">Thinking...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={bottomRef} />
             </div>
           )}
-          <div ref={bottomRef} />
         </div>
 
         {/* Input Area */}
-        <div className="relative">
-          <div className="flex gap-4 bg-gray-900/80 backdrop-blur-sm p-4 rounded-lg border border-cyan-400/30 relative overflow-hidden">
-            {/* Holographic input effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-green-500/10 to-purple-500/10 animate-pulse"></div>
-            
-            <div className="flex-1 relative z-10">
-              <textarea
-                rows={2}
-                className="w-full p-3 bg-black/50 border border-cyan-400/50 rounded-md resize-none text-green-400 placeholder-green-600 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 transition-all duration-300"
-                placeholder="{'>'} Enter neural command..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={loading}
-              />
-            </div>
-            
-            <button
-              onClick={sendMessage}
-              disabled={loading || !input.trim()}
-              className="relative z-10 group bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed px-6 py-3 rounded-md transition-all duration-300 font-semibold text-white shadow-lg hover:shadow-cyan-500/50 disabled:opacity-50"
-            >
-              <div className="flex items-center gap-2">
-                <Send className="w-4 h-4" />
-                <span>{loading ? "SENDING..." : "TRANSMIT"}</span>
+        <div className="border-t border-neutral-700/30 p-4 bg-neutral-800/30 backdrop-blur-sm">
+          <div className="max-w-4xl mx-auto">
+            <div className="relative flex items-end gap-3">
+              <button className="p-2 text-emerald-400 hover:text-emerald-300 hover:bg-neutral-700/50 rounded-xl transition-colors mb-2">
+                <Paperclip className="h-5 w-5" />
+              </button>
+              
+              <div className="flex-1">
+                <textarea
+                  rows={1}
+                  className="w-full p-3 bg-neutral-800/50 border border-neutral-600/50 rounded-xl resize-none text-emerald-100 placeholder-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200 min-h-[44px] max-h-32 backdrop-blur-sm"
+                  placeholder="Message AstraAI..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={loading}
+                  style={{ height: 'auto' }}
+                  onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = 'auto';
+                    target.style.height = target.scrollHeight + 'px';
+                  }}
+                />
               </div>
               
-              {/* Button glow effect */}
-              <div className="absolute inset-0 rounded-md bg-gradient-to-r from-cyan-400 to-purple-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-            </button>
-          </div>
-          
-          {/* Status indicators */}
-          <div className="flex justify-between items-center mt-2 text-xs text-cyan-600">
-            <span>ENCRYPTION: QUANTUM_LEVEL</span>
-            <span>LATENCY: {loading ? "PROCESSING..." : "0.001ms"}</span>
+              <button
+                onClick={sendMessage}
+                disabled={loading || !input.trim()}
+                className="p-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-neutral-700 disabled:cursor-not-allowed rounded-xl transition-colors mb-2 flex items-center justify-center min-w-[40px] h-10 shadow-sm"
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-neutral-900 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4 text-neutral-900" />
+                )}
+              </button>
+            </div>
+            
+            <div className="mt-2 text-xs text-emerald-400/70 text-center">
+              AstraAI can make mistakes. Verify important security information.
+            </div>
           </div>
         </div>
-      </div>
+      </main>
 
       <style>{`
-        @keyframes grid-move {
-          0% { transform: translate(0, 0); }
-          100% { transform: translate(50px, 50px); }
-        }
-        
-        @keyframes slide-in {
+        @keyframes fade-in {
           from {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(10px);
           }
           to {
             opacity: 1;
@@ -284,25 +282,12 @@ export default function App() {
           }
         }
         
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
         }
         
-        .animate-slide-in {
-          animation: slide-in 0.5s ease-out forwards;
-        }
-        
-        .animate-shimmer {
-          animation: shimmer 3s ease-in-out infinite;
-        }
-        
-        .scrollbar-thin {
-          scrollbar-width: thin;
-        }
-        
-        .scrollbar-track-gray-900 {
-          scrollbar-color: #0891b2 #111827;
+        .prose-green {
+          color: rgb(134 239 172);
         }
       `}</style>
     </div>
