@@ -11,12 +11,22 @@ import FAQs from "./pages/FAQs.tsx";
 import "./index.css";
 import ThreatReportApp from "./components/ThreatReportApp.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import WiChainDashboard from "./components/scan.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <AuthPage />,
   },
+  {
+  path: "/dashboard",
+  element: (
+   
+      <WiChainDashboard />
+  
+  ),
+},
+
   {
     path: "/home",
     element: (

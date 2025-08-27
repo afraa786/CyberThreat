@@ -1,0 +1,27 @@
+[
+  {
+    "index": 0,
+    "timestamp": "2025-08-23T12:57:49.331188",
+    "data": "Genesis Block",
+    "previous_hash": "0",
+    "hash": "f7ba8f261b803d124b7f4f346ae5b0850d31af4684a3ac4a81d74dc12e2a5be7"
+  },
+  {
+    "index": 1,
+    "timestamp": "2025-08-23T12:57:49.699931",
+    "data": {
+      "ssid": "Free Public WiFi",
+      "bssid": "12:34:56:78:90:ab",
+      "is_spoof": true,
+      "rule_based_reasons": [
+        "Suspicious SSID: Free Public WiFi",
+        "Insecure encryption: OPEN"
+      ],
+      "ml_confidence": 1.0,
+      "ml_prediction": 1,
+      "timestamp": "2025-08-23T12:57:49.699931"
+    },
+    "previous_hash": "f7ba8f261b803d124b7f4f346ae5b0850d31af4684a3ac4a81d74dc12e2a5be7",
+    "hash": "0f95a39d5ac0f7dce33120f6267ba3e5d8b72b3f743637b6e6060da14495572b"
+  }
+]
