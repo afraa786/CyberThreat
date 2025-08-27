@@ -44,7 +44,7 @@ class WiChainDetector:
         except FileNotFoundError:
             print(f"⚠️ OUI file not found at {path}")
             # Try alternative path
-            alt_path = r"C:\\Users\\Afraa\\Downloads\\wichain\\oui.json"
+            alt_path = r"C:\Users\Afraa\Downloads\wichain\oui.json"
             try:
                 with open(alt_path, "r") as f:
                     self.OUI_DATA = json.load(f)

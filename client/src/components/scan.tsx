@@ -75,38 +75,55 @@ import {
   Router,
 } from 'lucide-react';
 
-// Types
+// API base URL
+const API_BASE = 'http://localhost:8000';
+
+// Types based on your API responses
 interface NetworkDevice {
-  id: string;
-  name: string;
-  mac_address: string;
-  ip_address: string;
+  ssid: string;
+  bssid: string;
+  is_spoof: boolean;
   vendor: string;
-  signal_strength: number;
-  encryption: string;
-  is_spoofed: boolean;
-  last_seen: string;
-  location?: { lat: number; lng: number };
-  device_type: string;
+  ml_confidence: number;
+  ml_prediction: number;
+  timestamp: string;
+  features: {
+    signal_strength: number;
+    channel: number;
+    frequency: number;
+    ssid_length: number;
+    has_common_rogue_pattern: number;
+    is_hidden: number;
+    vendor_risk: number;
+    is_locally_administered: number;
+    encryption_risk: number;
+    signal_category: number;
+    channel_width: number;
+    is_DFS_channel: number;
+  };
+  reasons: string[];
 }
 
 interface BlockchainData {
-  block_height: number;
-  hash: string;
+  block_height?: number;
+  hash?: string;
   timestamp: string;
-  transactions: number;
-  size: number;
-  difficulty: string;
+  transactions?: number;
+  size?: number;
+  difficulty?: string;
+  // Your API returns network data in blockchain
+  ssid?: string;
+  bssid?: string;
+  is_spoof?: boolean;
+  vendor?: string;
+  ml_confidence?: number;
 }
 
 interface SystemStats {
   total_networks: number;
-  active_scans: number;
-  spoofed_networks: number;
-  cpu_usage: number;
-  memory_usage: number;
-  disk_usage: number;
-  uptime: string;
+  spoof_networks: number;
+  legitimate_networks: number;
+  spoof_percentage: number;
 }
 
 interface ScanConfig {
@@ -138,7 +155,7 @@ const Sidebar: React.FC<{
     >
       <div className="flex items-center gap-2 mb-8">
         <Shield className="w-8 h-8 text-primary" />
-        <h1 className="text-xl font-bold">SecureNet</h1>
+        <h1 className="text-xl font-bold">Wifi Detection</h1>
       </div>
       <nav className="space-y-2">
         {tabs.map(({ id, label, icon: Icon }) => (
@@ -171,10 +188,22 @@ const NetworkDetection: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
+  // Move these two functions to the top of the component, before any usage!
+  const getDeviceIcon = (encryptionRisk: number) => {
+    return encryptionRisk === 1 ? Unlock : Lock;
+  };
+
+  const getSignalStrength = (strength: number) => {
+    // Convert negative dBm to percentage (approx)
+    if (strength >= -50) return 100;
+    if (strength <= -100) return 0;
+    return Math.round(2 * (strength + 100));
+  };
+
   const fetchNetworks = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/networks?limit=20');
+      const response = await fetch(`${API_BASE}/api/networks?limit=20`);
       if (!response.ok) {
         // If API doesn't exist, use mock data
         if (response.status === 404) {
@@ -203,10 +232,9 @@ const NetworkDetection: React.FC = () => {
   const startScan = async () => {
     try {
       setIsScanning(true);
-      const response = await fetch('/api/scan', {
+      // Your API doesn't expect a body for /api/scan
+      const response = await fetch(`${API_BASE}/api/scan`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(scanConfig),
       });
       if (!response.ok) {
         if (response.status === 404) {
@@ -233,39 +261,39 @@ const NetworkDetection: React.FC = () => {
 
   const runDetection = async () => {
     try {
-      const response = await fetch('/api/detect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ networks }),
-      });
-      if (!response.ok) {
-        if (response.status === 404) {
-          // Simulate detection with mock data
-          const updatedNetworks = networks.map(network => ({
-            ...network,
-            is_spoofed: Math.random() > 0.8
-          }));
-          setNetworks(updatedNetworks);
-          return;
+      // For each network, run detection
+      const detectionResults = [];
+      for (const network of networks) {
+        const response = await fetch(`${API_BASE}/api/detect`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ssid: network.ssid,
+            bssid: network.bssid,
+            signal_strength: network.features.signal_strength,
+            frequency: network.features.frequency,
+            channel: network.features.channel,
+            encryption: network.features.encryption_risk === 1 ? 'Open' : 'Secure',
+            latitude: 0, // You might want to get actual location
+            longitude: 0,
+            vendor: network.vendor
+          }),
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          detectionResults.push(result);
         }
-        throw new Error('Detection failed');
       }
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        const updatedNetworks = networks.map(network => ({
-          ...network,
-          is_spoofed: Math.random() > 0.8
-        }));
-        setNetworks(updatedNetworks);
-        return;
+      
+      if (detectionResults.length > 0) {
+        setNetworks(detectionResults);
       }
-      const results = await response.json();
-      setNetworks(results);
     } catch (err) {
       // Simulate detection on error
       const updatedNetworks = networks.map(network => ({
         ...network,
-        is_spoofed: Math.random() > 0.8
+        is_spoof: Math.random() > 0.8
       }));
       setNetworks(updatedNetworks);
       setError('Using mock data - API not available');
@@ -276,24 +304,81 @@ const NetworkDetection: React.FC = () => {
     fetchNetworks();
   }, [fetchNetworks]);
 
+  // This is correct:
   const filteredNetworks = networks.filter(
     (network) => selectedVendor === 'all' || network.vendor === selectedVendor
   );
 
-  const vendors = Array.from(new Set(networks.map((n) => n.vendor)));
+  // Update the secure networks count calculation:
+  <div className="flex justify-between">
+    <span>Secure Networks</span>
+    <Badge variant="default">
+      {networks.filter((n) => n.features?.encryption_risk === 0).length}
+    </Badge>
+  </div>
 
-  const getDeviceIcon = (type: string) => {
-    switch (type) {
-      case 'smartphone':
-        return Smartphone;
-      case 'laptop':
-        return Laptop;
-      case 'router':
-        return Router;
-      default:
-        return Network;
-    }
-  };
+  // In the table rendering, add safety checks for the features property:
+  {filteredNetworks.map((network) => {
+    const EncryptionIcon = getDeviceIcon(network.features?.encryption_risk || 0);
+    const signalStrength = getSignalStrength(network.features?.signal_strength || -100);
+    
+    return (
+      <TableRow key={network.bssid}>
+        <TableCell className="flex items-center gap-2">
+          <Wifi className="w-4 h-4" />
+          {network.ssid || 'Hidden'}
+        </TableCell>
+        <TableCell className="font-mono text-sm">
+          {network.bssid}
+        </TableCell>
+        <TableCell>{network.vendor}</TableCell>
+        <TableCell>
+          <div className="flex items-center gap-2">
+            <Progress
+              value={signalStrength}
+              className="w-16"
+            />
+            <span className="text-sm">
+              {signalStrength}%
+            </span>
+          </div>
+        </TableCell>
+        <TableCell>{network.features?.channel || 'N/A'}</TableCell>
+        <TableCell>
+          <Badge
+            variant={
+              network.features?.encryption_risk === 1
+                ? 'destructive'
+                : 'default'
+            }
+          >
+            <EncryptionIcon className="w-3 h-3 mr-1" />
+            {network.features?.encryption_risk === 1 ? 'Insecure' : 'Secure'}
+          </Badge>
+        </TableCell>
+        <TableCell>
+          <Badge
+            variant={network.is_spoof ? 'destructive' : 'default'}
+          >
+            {network.is_spoof ? (
+              <AlertTriangle className="w-3 h-3 mr-1" />
+            ) : (
+              <Shield className="w-3 h-3 mr-1" />
+            )}
+            {network.is_spoof ? 'Spoofed' : 'Secure'}
+          </Badge>
+        </TableCell>
+        <TableCell>
+          <Progress value={(network.ml_confidence || 0) * 100} />
+          <span className="text-xs">{Math.round((network.ml_confidence || 0) * 100)}%</span>
+        </TableCell>
+        <TableCell className="text-sm">
+          {new Date(network.timestamp).toLocaleTimeString()}
+        </TableCell>
+      </TableRow>
+    );
+  })}
+  const vendors = Array.from(new Set(networks.map((n) => n.vendor)));
 
   return (
     <div className="space-y-6">
@@ -401,13 +486,13 @@ const NetworkDetection: React.FC = () => {
               <div className="flex justify-between">
                 <span>Spoofed Networks</span>
                 <Badge variant="destructive">
-                  {networks.filter((n) => n.is_spoofed).length}
+                  {networks.filter((n) => n.is_spoof).length}
                 </Badge>
               </div>
               <div className="flex justify-between">
                 <span>Secure Networks</span>
                 <Badge variant="default">
-                  {networks.filter((n) => n.encryption !== 'Open').length}
+                  {networks.filter((n) => n.features?.encryption_risk === 0).length}
                 </Badge>
               </div>
             </div>
@@ -471,71 +556,74 @@ const NetworkDetection: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Device</TableHead>
-                <TableHead>MAC Address</TableHead>
-                <TableHead>IP Address</TableHead>
+                <TableHead>SSID</TableHead>
+                <TableHead>BSSID</TableHead>
                 <TableHead>Vendor</TableHead>
                 <TableHead>Signal</TableHead>
-                <TableHead>Encryption</TableHead>
+                <TableHead>Channel</TableHead>
+                <TableHead>Security</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Confidence</TableHead>
                 <TableHead>Last Seen</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredNetworks.map((network) => {
-                const DeviceIcon = getDeviceIcon(network.device_type);
+                const EncryptionIcon = getDeviceIcon(network.features?.encryption_risk || 0);
+                const signalStrength = getSignalStrength(network.features?.signal_strength || -100);
+                
                 return (
-                  <TableRow key={network.id}>
+                  <TableRow key={network.bssid}>
                     <TableCell className="flex items-center gap-2">
-                      <DeviceIcon className="w-4 h-4" />
-                      {network.name}
+                      <Wifi className="w-4 h-4" />
+                      {network.ssid || 'Hidden'}
                     </TableCell>
                     <TableCell className="font-mono text-sm">
-                      {network.mac_address}
+                      {network.bssid}
                     </TableCell>
-                    <TableCell>{network.ip_address}</TableCell>
                     <TableCell>{network.vendor}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Progress
-                          value={network.signal_strength}
+                          value={signalStrength}
                           className="w-16"
                         />
                         <span className="text-sm">
-                          {network.signal_strength}%
+                          {signalStrength}%
                         </span>
                       </div>
                     </TableCell>
+                    <TableCell>{network.features?.channel || 'N/A'}</TableCell>
                     <TableCell>
                       <Badge
                         variant={
-                          network.encryption === 'Open'
+                          network.features?.encryption_risk === 1
                             ? 'destructive'
                             : 'default'
                         }
                       >
-                        {network.encryption === 'Open' ? (
-                          <Unlock className="w-3 h-3 mr-1" />
-                        ) : (
-                          <Lock className="w-3 h-3 mr-1" />
-                        )}
-                        {network.encryption}
+                        <EncryptionIcon className="w-3 h-3 mr-1" />
+                        {network.features?.encryption_risk === 1 ? 'Insecure' : 'Secure'}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant={network.is_spoofed ? 'destructive' : 'default'}
+                        variant={network.is_spoof ? 'destructive' : 'default'}
                       >
-                        {network.is_spoofed ? (
+                        {network.is_spoof ? (
                           <AlertTriangle className="w-3 h-3 mr-1" />
                         ) : (
                           <Shield className="w-3 h-3 mr-1" />
                         )}
-                        {network.is_spoofed ? 'Spoofed' : 'Secure'}
+                        {network.is_spoof ? 'Spoofed' : 'Secure'}
                       </Badge>
                     </TableCell>
+                    <TableCell>
+                      <Progress value={(network.ml_confidence || 0) * 100} />
+                      <span className="text-xs">{Math.round((network.ml_confidence || 0) * 100)}%</span>
+                    </TableCell>
                     <TableCell className="text-sm">
-                      {new Date(network.last_seen).toLocaleTimeString()}
+                      {new Date(network.timestamp).toLocaleTimeString()}
                     </TableCell>
                   </TableRow>
                 );
@@ -557,7 +645,7 @@ const BlockchainExplorer: React.FC = () => {
   const fetchBlockchainData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/blockchain');
+      const response = await fetch(`${API_BASE}/api/blockchain`);
       if (!response.ok) {
         if (response.status === 404) {
           setBlocks(generateMockBlocks());
@@ -586,10 +674,11 @@ const BlockchainExplorer: React.FC = () => {
     return () => clearInterval(interval);
   }, [fetchBlockchainData]);
 
+  // Prepare chart data from blockchain
   const chartData = blocks.map((block, index) => ({
-    block: block.block_height,
-    transactions: block.transactions,
-    size: block.size / 1024, // Convert to KB
+    index,
+    timestamp: new Date(block.timestamp).toLocaleTimeString(),
+    is_spoof: block.is_spoof ? 1 : 0,
   }));
 
   return (
@@ -602,7 +691,7 @@ const BlockchainExplorer: React.FC = () => {
         <div>
           <h2 className="text-3xl font-bold">Blockchain Explorer</h2>
           <p className="text-muted-foreground">
-            Monitor blockchain activity and transactions
+            Monitor blockchain activity and network validations
           </p>
         </div>
         <Button onClick={fetchBlockchainData} disabled={loading}>
@@ -621,36 +710,7 @@ const BlockchainExplorer: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Latest Block</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {blocks.length > 0 && (
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Height:</span>
-                  <span className="font-mono">
-                    {blocks[0]?.block_height.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Transactions:</span>
-                  <span>{blocks[0]?.transactions}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Size:</span>
-                  <span>{(blocks[0]?.size / 1024).toFixed(2)} KB</span>
-                </div>
-                <div className="text-xs text-muted-foreground break-all">
-                  Hash: {blocks[0]?.hash}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Network Stats</CardTitle>
+            <CardTitle>Blockchain Stats</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -659,23 +719,16 @@ const BlockchainExplorer: React.FC = () => {
                 <Badge variant="secondary">{blocks.length}</Badge>
               </div>
               <div className="flex justify-between">
-                <span>Avg Block Size</span>
-                <span>
-                  {blocks.length > 0
-                    ? (
-                        blocks.reduce((sum, block) => sum + block.size, 0) /
-                        blocks.length /
-                        1024
-                      ).toFixed(2)
-                    : 0}{' '}
-                  KB
-                </span>
+                <span>Spoofed Validations</span>
+                <Badge variant="destructive">
+                  {blocks.filter(block => block.is_spoof).length}
+                </Badge>
               </div>
               <div className="flex justify-between">
-                <span>Total Transactions</span>
-                <span>
-                  {blocks.reduce((sum, block) => sum + block.transactions, 0)}
-                </span>
+                <span>Secure Validations</span>
+                <Badge variant="default">
+                  {blocks.filter(block => !block.is_spoof).length}
+                </Badge>
               </div>
             </div>
           </CardContent>
@@ -683,60 +736,88 @@ const BlockchainExplorer: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Block Activity</CardTitle>
+            <CardTitle>Validation Activity</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={chartData.slice(-10)}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="block" />
+                <XAxis dataKey="timestamp" />
                 <YAxis />
                 <Tooltip />
                 <Area
                   type="monotone"
-                  dataKey="transactions"
-                  stroke="#8884d8"
-                  fill="#8884d8"
+                  dataKey="is_spoof"
+                  stroke="#ff6b6b"
+                  fill="#ff6b6b"
                   fillOpacity={0.6}
+                  name="Spoof Detections"
                 />
               </AreaChart>
             </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Latest Validation</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {blocks.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>SSID:</span>
+                  <span className="font-medium">{blocks[0]?.ssid || 'Unknown'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Status:</span>
+                  <Badge variant={blocks[0]?.is_spoof ? 'destructive' : 'default'}>
+                    {blocks[0]?.is_spoof ? 'Spoofed' : 'Secure'}
+                  </Badge>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Time: {new Date(blocks[0]?.timestamp || '').toLocaleString()}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent Blocks</CardTitle>
+          <CardTitle>Recent Validations</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Height</TableHead>
-                <TableHead>Hash</TableHead>
                 <TableHead>Timestamp</TableHead>
-                <TableHead>Transactions</TableHead>
-                <TableHead>Size</TableHead>
-                <TableHead>Difficulty</TableHead>
+                <TableHead>SSID</TableHead>
+                <TableHead>BSSID</TableHead>
+                <TableHead>Vendor</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Confidence</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {blocks.slice(0, 10).map((block) => (
-                <TableRow key={block.block_height}>
-                  <TableCell className="font-mono">
-                    {block.block_height.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="font-mono text-xs">
-                    {block.hash.slice(0, 16)}...
-                  </TableCell>
+              {blocks.slice(0, 10).map((block, index) => (
+                <TableRow key={index}>
                   <TableCell>
                     {new Date(block.timestamp).toLocaleString()}
                   </TableCell>
-                  <TableCell>{block.transactions}</TableCell>
-                  <TableCell>{(block.size / 1024).toFixed(2)} KB</TableCell>
+                  <TableCell>{block.ssid || 'Hidden'}</TableCell>
                   <TableCell className="font-mono text-xs">
-                    {block.difficulty.slice(0, 10)}...
+                    {block.bssid?.slice(0, 16)}...
+                  </TableCell>
+                  <TableCell>{block.vendor || 'Unknown'}</TableCell>
+                  <TableCell>
+                    <Badge variant={block.is_spoof ? 'destructive' : 'default'}>
+                      {block.is_spoof ? 'Spoofed' : 'Secure'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {block.ml_confidence ? `${Math.round(block.ml_confidence * 100)}%` : 'N/A'}
                   </TableCell>
                 </TableRow>
               ))}
@@ -751,27 +832,17 @@ const BlockchainExplorer: React.FC = () => {
 // System Statistics Page
 const SystemStatistics: React.FC = () => {
   const [stats, setStats] = useState<SystemStats | null>(null);
-  const [historicalData, setHistoricalData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
   const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/stats');
+      const response = await fetch(`${API_BASE}/api/stats`);
       if (!response.ok) {
         if (response.status === 404) {
           const mockStats = generateMockStats();
           setStats(mockStats);
-          setHistoricalData(prev => [
-            ...prev.slice(-19),
-            {
-              timestamp: new Date().toLocaleTimeString(),
-              cpu: mockStats.cpu_usage,
-              memory: mockStats.memory_usage,
-              disk: mockStats.disk_usage,
-            }
-          ]);
           return;
         }
         throw new Error('Failed to fetch statistics');
@@ -780,36 +851,13 @@ const SystemStatistics: React.FC = () => {
       if (!contentType || !contentType.includes('application/json')) {
         const mockStats = generateMockStats();
         setStats(mockStats);
-        setHistoricalData(prev => [
-          ...prev.slice(-19),
-          {
-            timestamp: new Date().toLocaleTimeString(),
-            cpu: mockStats.cpu_usage,
-            memory: mockStats.memory_usage,
-            disk: mockStats.disk_usage,
-          }
-        ]);
         return;
       }
       const data = await response.json();
       setStats(data);
-      
-      // Add to historical data for charts
-      setHistoricalData(prev => [
-        ...prev.slice(-19),
-        {
-          timestamp: new Date().toLocaleTimeString(),
-          cpu: data.cpu_usage,
-          memory: data.memory_usage,
-          disk: data.disk_usage,
-        }
-      ]);
     } catch (err) {
       const mockStats = generateMockStats();
       setStats(mockStats);
-      setHistoricalData(prev => [...prev.slice(-19), {
-        timestamp: new Date().toLocaleTimeString(), cpu: mockStats.cpu_usage, memory: mockStats.memory_usage, disk: mockStats.disk_usage
-      }]);
       setError('Using mock data - API not available');
     } finally {
       setLoading(false);
@@ -832,7 +880,7 @@ const SystemStatistics: React.FC = () => {
         <div>
           <h2 className="text-3xl font-bold">System Statistics</h2>
           <p className="text-muted-foreground">
-            Monitor system performance and resource usage
+            Monitor system performance and detection metrics
           </p>
         </div>
         <Button onClick={fetchStats} disabled={loading}>
@@ -866,121 +914,65 @@ const SystemStatistics: React.FC = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Active Scans
-                </CardTitle>
-                <Activity className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.active_scans}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
                   Spoofed Networks
                 </CardTitle>
                 <AlertTriangle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-red-600">
-                  {stats.spoofed_networks}
+                  {stats.spoof_networks}
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Uptime</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Legitimate Networks
+                </CardTitle>
+                <Shield className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">
+                  {stats.legitimate_networks}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Spoof Percentage
+                </CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.uptime}</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>CPU Usage</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Current:</span>
-                    <span>{stats.cpu_usage}%</span>
-                  </div>
-                  <Progress value={stats.cpu_usage} />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Memory Usage</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Current:</span>
-                    <span>{stats.memory_usage}%</span>
-                  </div>
-                  <Progress value={stats.memory_usage} />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Disk Usage</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Current:</span>
-                    <span>{stats.disk_usage}%</span>
-                  </div>
-                  <Progress value={stats.disk_usage} />
-                </div>
+                <div className="text-2xl font-bold">{stats.spoof_percentage}%</div>
               </CardContent>
             </Card>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Resource Usage History</CardTitle>
+              <CardTitle>Detection Statistics</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={historicalData}>
+                <BarChart
+                  data={[
+                    { name: 'Spoofed', value: stats.spoof_networks, color: '#ff6b6b' },
+                    { name: 'Legitimate', value: stats.legitimate_networks, color: '#51cf66' },
+                  ]}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="timestamp" />
+                  <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="cpu"
-                    stroke="#8884d8"
-                    name="CPU %"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="memory"
-                    stroke="#82ca9d"
-                    name="Memory %"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="disk"
-                    stroke="#ffc658"
-                    name="Disk %"
-                  />
-                </LineChart>
+                  <Bar dataKey="value" fill="#8884d8" />
+                </BarChart>
               </ResponsiveContainer>
             </CardContent>
-          </Card>
+            </Card>
         </>
       )}
     </div>
@@ -995,32 +987,62 @@ const RealTimeMonitoring: React.FC = () => {
   const [realtimeData, setRealtimeData] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (autoRefresh && isMonitoring) {
-      interval = setInterval(() => {
-        // Simulate real-time data updates
+  const fetchRealTimeData = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/scan_real`);
+      if (!response.ok) {
+        // Simulate data if API not available
         const newData = {
           timestamp: new Date().toLocaleTimeString(),
           threats: Math.floor(Math.random() * 10),
-          scans: Math.floor(Math.random() * 50) + 10,
           networks: Math.floor(Math.random() * 100) + 50,
         };
         setRealtimeData(prev => [...prev.slice(-19), newData]);
-
-        // Generate random alerts
-        if (Math.random() > 0.8) {
-          setAlerts(prev => [{
-            id: Date.now(),
-            type: 'warning',
-            message: 'Suspicious network activity detected',
-            timestamp: new Date(),
-          }, ...prev.slice(0, 9)]);
+        return;
+      }
+      const data = await response.json();
+      
+      // Add to realtime data for charts
+      setRealtimeData(prev => [
+        ...prev.slice(-19),
+        {
+          timestamp: new Date().toLocaleTimeString(),
+          threats: data.filter((n: NetworkDevice) => n.is_spoof).length,
+          networks: data.length,
         }
-      }, refreshInterval * 1000);
+      ]);
+
+      // Check for new alerts
+      const newSpoofs = data.filter((n: NetworkDevice) => n.is_spoof);
+      if (newSpoofs.length > 0) {
+        setAlerts(prev => [
+          ...newSpoofs.map((network: NetworkDevice) => ({
+            id: `${network.bssid}-${Date.now()}`,
+            type: 'warning',
+            message: `Spoofed network detected: ${network.ssid || 'Hidden'} (${network.bssid})`,
+            timestamp: new Date(),
+          })),
+          ...prev.slice(0, 10 - newSpoofs.length)
+        ]);
+      }
+    } catch (err) {
+      // Simulate data on error
+      const newData = {
+        timestamp: new Date().toLocaleTimeString(),
+        threats: Math.floor(Math.random() * 10),
+        networks: Math.floor(Math.random() * 100) + 50,
+      };
+      setRealtimeData(prev => [...prev.slice(-19), newData]);
+    }
+  }, []);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (autoRefresh && isMonitoring) {
+      interval = setInterval(fetchRealTimeData, refreshInterval * 1000);
     }
     return () => clearInterval(interval);
-  }, [autoRefresh, isMonitoring, refreshInterval]);
+  }, [autoRefresh, isMonitoring, refreshInterval, fetchRealTimeData]);
 
   return (
     <div className="space-y-6">
@@ -1092,12 +1114,6 @@ const RealTimeMonitoring: React.FC = () => {
                 />
                 <Line
                   type="monotone"
-                  dataKey="scans"
-                  stroke="#4ecdc4"
-                  name="Scans"
-                />
-                <Line
-                  type="monotone"
                   dataKey="networks"
                   stroke="#45b7d1"
                   name="Networks"
@@ -1113,7 +1129,7 @@ const RealTimeMonitoring: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-2 max-h-64 overflow-y-auto">
-              {alerts.length === 0 ? (
+              { alerts.length === 0 ? (
                 <p className="text-muted-foreground">No alerts</p>
               ) : (
                 alerts.map((alert) => (
@@ -1132,7 +1148,7 @@ const RealTimeMonitoring: React.FC = () => {
                     </div>
                   </motion.div>
                 ))
-              )}
+              ) }
             </div>
           </CardContent>
         </Card>
@@ -1157,16 +1173,16 @@ const RealTimeMonitoring: React.FC = () => {
               <p className="text-sm text-muted-foreground">Active Networks</p>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">
-                {realtimeData.length > 0 ? realtimeData[realtimeData.length - 1]?.scans || 0 : 0}
-              </div>
-              <p className="text-sm text-muted-foreground">Active Scans</p>
-            </div>
-            <div className="text-center">
               <div className="text-2xl font-bold text-red-600">
                 {realtimeData.length > 0 ? realtimeData[realtimeData.length - 1]?.threats || 0 : 0}
               </div>
               <p className="text-sm text-muted-foreground">Threats Detected</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">
+                {refreshInterval}s
+              </div>
+              <p className="text-sm text-muted-foreground">Refresh Interval</p>
             </div>
           </div>
         </CardContent>
@@ -1177,43 +1193,49 @@ const RealTimeMonitoring: React.FC = () => {
 
 // Mock data generators
 const generateMockNetworks = (): NetworkDevice[] => {
-  const vendors = ['Apple', 'Samsung', 'Google', 'Microsoft', 'Cisco', 'Netgear'];
-  const deviceTypes = ['smartphone', 'laptop', 'router', 'tablet'];
-  const encryptions = ['WPA2', 'WPA3', 'Open', 'WEP'];
-  
+  const vendors = ['vivo Mobile Communication Co., Ltd.', 'TP link Technologies Co., Ltd.'];
   return Array.from({ length: 15 }, (_, i) => ({
-    id: `device-${i}`,
-    name: `Device-${i + 1}`,
-    mac_address: `${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}`,
-    ip_address: `192.168.1.${i + 100}`,
+    ssid: `Network-${i + 1}`,
+    bssid: `${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}`,
+    is_spoof: Math.random() > 0.8,
     vendor: vendors[Math.floor(Math.random() * vendors.length)],
-    signal_strength: Math.floor(Math.random() * 100),
-    encryption: encryptions[Math.floor(Math.random() * encryptions.length)],
-    is_spoofed: Math.random() > 0.8,
-    last_seen: new Date(Date.now() - Math.random() * 3600000).toISOString(),
-    device_type: deviceTypes[Math.floor(Math.random() * deviceTypes.length)],
+    ml_confidence: Math.random(),
+    ml_prediction: Math.random() > 0.5 ? 1 : 0,
+    timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString(),
+    features: {
+      signal_strength: -Math.floor(Math.random() * 50) - 50, // -50 to -100 dBm
+      channel: Math.floor(Math.random() * 11) + 1,
+      frequency: Math.random() > 0.5 ? 2.4 : 5.0,
+      ssid_length: Math.floor(Math.random() * 20) + 1,
+      has_common_rogue_pattern: Math.random() > 0.8 ? 1 : 0,
+      is_hidden: Math.random() > 0.9 ? 1 : 0,
+      vendor_risk: Math.random() > 0.7 ? 1 : 0,
+      is_locally_administered: Math.random() > 0.5 ? 1 : 0,
+      encryption_risk: Math.random() > 0.3 ? 1 : 0,
+      signal_category: Math.floor(Math.random() * 3),
+      channel_width: 20,
+      is_DFS_channel: 0
+    },
+    reasons: Math.random() > 0.8 ? ['Low signal strength', 'Suspicious vendor'] : []
   }));
 };
 
 const generateMockBlocks = (): BlockchainData[] => {
   return Array.from({ length: 20 }, (_, i) => ({
-    block_height: 800000 + i,
-    hash: `0x${Math.random().toString(16).substr(2, 64)}`,
     timestamp: new Date(Date.now() - i * 600000).toISOString(),
-    transactions: Math.floor(Math.random() * 3000) + 500,
-    size: Math.floor(Math.random() * 2000000) + 500000,
-    difficulty: `0x${Math.random().toString(16).substr(2, 16)}`,
+    ssid: `Network-${i + 1}`,
+    bssid: `${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}:${Math.random().toString(16).substr(2, 2).toUpperCase()}`,
+    is_spoof: Math.random() > 0.8,
+    vendor: 'vivo Mobile Communication Co., Ltd.',
+    ml_confidence: Math.random()
   }));
 };
 
 const generateMockStats = (): SystemStats => ({
   total_networks: Math.floor(Math.random() * 100) + 50,
-  active_scans: Math.floor(Math.random() * 10) + 1,
-  spoofed_networks: Math.floor(Math.random() * 5),
-  cpu_usage: Math.floor(Math.random() * 100),
-  memory_usage: Math.floor(Math.random() * 100),
-  disk_usage: Math.floor(Math.random() * 100),
-  uptime: `${Math.floor(Math.random() * 24)}h ${Math.floor(Math.random() * 60)}m`,
+  spoof_networks: Math.floor(Math.random() * 15),
+  legitimate_networks: Math.floor(Math.random() * 85) + 15,
+  spoof_percentage: Math.floor(Math.random() * 30)
 });
 
 // Main App Component

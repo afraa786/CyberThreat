@@ -21,11 +21,11 @@ const router = createBrowserRouter([
     element: <AuthPage />,
   },
   {
-  path: "/dashboard",
+  path: "/wifi",
   element: (
-   
+      <ProtectedRoute>
       <WiChainDashboard />
-  
+     </ProtectedRoute>
   ),
 },
 
@@ -81,6 +81,7 @@ const router = createBrowserRouter([
     path: "/faqs",
     element: <FAQs />, 
   },
+
   {
     path: "/threatsnitch",
     element: (
