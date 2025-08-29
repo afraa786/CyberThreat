@@ -143,8 +143,8 @@ const Sidebar: React.FC<{
   const tabs = [
     { id: 'detection', label: 'Network Detection', icon: Shield },
     { id: 'blockchain', label: 'Blockchain Explorer', icon: Database },
-    { id: 'statistics', label: 'System Statistics', icon: BarChart3 },
-    { id: 'monitoring', label: 'Real-time Monitoring', icon: Activity },
+    // { id: 'statistics', label: 'System Statistics', icon: BarChart3 },
+    // { id: 'monitoring', label: 'Real-time Monitoring', icon: Activity },
   ];
 
   return (
@@ -979,217 +979,217 @@ const SystemStatistics: React.FC = () => {
   );
 };
 
-// Real-time Monitoring Page
-const RealTimeMonitoring: React.FC = () => {
-  const [isMonitoring, setIsMonitoring] = useState(false);
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [refreshInterval, setRefreshInterval] = useState(5);
-  const [realtimeData, setRealtimeData] = useState<any[]>([]);
-  const [alerts, setAlerts] = useState<any[]>([]);
+// // Real-time Monitoring Page
+// const RealTimeMonitoring: React.FC = () => {
+//   const [isMonitoring, setIsMonitoring] = useState(false);
+//   const [autoRefresh, setAutoRefresh] = useState(false);
+//   const [refreshInterval, setRefreshInterval] = useState(5);
+//   const [realtimeData, setRealtimeData] = useState<any[]>([]);
+//   const [alerts, setAlerts] = useState<any[]>([]);
 
-  const fetchRealTimeData = useCallback(async () => {
-    try {
-      const response = await fetch(`${API_BASE}/api/scan_real`);
-      if (!response.ok) {
-        // Simulate data if API not available
-        const newData = {
-          timestamp: new Date().toLocaleTimeString(),
-          threats: Math.floor(Math.random() * 10),
-          networks: Math.floor(Math.random() * 100) + 50,
-        };
-        setRealtimeData(prev => [...prev.slice(-19), newData]);
-        return;
-      }
-      const data = await response.json();
+//   const fetchRealTimeData = useCallback(async () => {
+//     try {
+//       const response = await fetch(`${API_BASE}/api/scan_real`);
+//       if (!response.ok) {
+//         // Simulate data if API not available
+//         const newData = {
+//           timestamp: new Date().toLocaleTimeString(),
+//           threats: Math.floor(Math.random() * 10),
+//           networks: Math.floor(Math.random() * 100) + 50,
+//         };
+//         setRealtimeData(prev => [...prev.slice(-19), newData]);
+//         return;
+//       }
+//       const data = await response.json();
       
-      // Add to realtime data for charts
-      setRealtimeData(prev => [
-        ...prev.slice(-19),
-        {
-          timestamp: new Date().toLocaleTimeString(),
-          threats: data.filter((n: NetworkDevice) => n.is_spoof).length,
-          networks: data.length,
-        }
-      ]);
+//       // Add to realtime data for charts
+//       setRealtimeData(prev => [
+//         ...prev.slice(-19),
+//         {
+//           timestamp: new Date().toLocaleTimeString(),
+//           threats: data.filter((n: NetworkDevice) => n.is_spoof).length,
+//           networks: data.length,
+//         }
+//       ]);
 
-      // Check for new alerts
-      const newSpoofs = data.filter((n: NetworkDevice) => n.is_spoof);
-      if (newSpoofs.length > 0) {
-        setAlerts(prev => [
-          ...newSpoofs.map((network: NetworkDevice) => ({
-            id: `${network.bssid}-${Date.now()}`,
-            type: 'warning',
-            message: `Spoofed network detected: ${network.ssid || 'Hidden'} (${network.bssid})`,
-            timestamp: new Date(),
-          })),
-          ...prev.slice(0, 10 - newSpoofs.length)
-        ]);
-      }
-    } catch (err) {
-      // Simulate data on error
-      const newData = {
-        timestamp: new Date().toLocaleTimeString(),
-        threats: Math.floor(Math.random() * 10),
-        networks: Math.floor(Math.random() * 100) + 50,
-      };
-      setRealtimeData(prev => [...prev.slice(-19), newData]);
-    }
-  }, []);
+//       // Check for new alerts
+//       const newSpoofs = data.filter((n: NetworkDevice) => n.is_spoof);
+//       if (newSpoofs.length > 0) {
+//         setAlerts(prev => [
+//           ...newSpoofs.map((network: NetworkDevice) => ({
+//             id: `${network.bssid}-${Date.now()}`,
+//             type: 'warning',
+//             message: `Spoofed network detected: ${network.ssid || 'Hidden'} (${network.bssid})`,
+//             timestamp: new Date(),
+//           })),
+//           ...prev.slice(0, 10 - newSpoofs.length)
+//         ]);
+//       }
+//     } catch (err) {
+//       // Simulate data on error
+//       const newData = {
+//         timestamp: new Date().toLocaleTimeString(),
+//         threats: Math.floor(Math.random() * 10),
+//         networks: Math.floor(Math.random() * 100) + 50,
+//       };
+//       setRealtimeData(prev => [...prev.slice(-19), newData]);
+//     }
+//   }, []);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (autoRefresh && isMonitoring) {
-      interval = setInterval(fetchRealTimeData, refreshInterval * 1000);
-    }
-    return () => clearInterval(interval);
-  }, [autoRefresh, isMonitoring, refreshInterval, fetchRealTimeData]);
+//   useEffect(() => {
+//     let interval: NodeJS.Timeout;
+//     if (autoRefresh && isMonitoring) {
+//       interval = setInterval(fetchRealTimeData, refreshInterval * 1000);
+//     }
+//     return () => clearInterval(interval);
+//   }, [autoRefresh, isMonitoring, refreshInterval, fetchRealTimeData]);
 
-  return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex justify-between items-center"
-      >
-        <div>
-          <h2 className="text-3xl font-bold">Real-time Monitoring</h2>
-          <p className="text-muted-foreground">
-            Live monitoring of network security events
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Label>Auto-refresh:</Label>
-            <Switch
-              checked={autoRefresh}
-              onCheckedChange={setAutoRefresh}
-            />
-          </div>
-          <Select
-            value={refreshInterval.toString()}
-            onValueChange={(value) => setRefreshInterval(+value)}
-          >
-            <SelectTrigger className="w-24">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">1s</SelectItem>
-              <SelectItem value="5">5s</SelectItem>
-              <SelectItem value="10">10s</SelectItem>
-              <SelectItem value="30">30s</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            onClick={() => setIsMonitoring(!isMonitoring)}
-            variant={isMonitoring ? 'destructive' : 'default'}
-          >
-            {isMonitoring ? (
-              <Pause className="w-4 h-4 mr-2" />
-            ) : (
-              <Play className="w-4 h-4 mr-2" />
-            )}
-            {isMonitoring ? 'Stop' : 'Start'} Monitoring
-          </Button>
-        </div>
-      </motion.div>
+//   return (
+//     <div className="space-y-6">
+//       <motion.div
+//         initial={{ opacity: 0, y: 20 }}
+//         animate={{ opacity: 1, y: 0 }}
+//         className="flex justify-between items-center"
+//       >
+//         <div>
+//           <h2 className="text-3xl font-bold">Real-time Monitoring</h2>
+//           <p className="text-muted-foreground">
+//             Live monitoring of network security events
+//           </p>
+//         </div>
+//         <div className="flex items-center gap-4">
+//           <div className="flex items-center gap-2">
+//             <Label>Auto-refresh:</Label>
+//             <Switch
+//               checked={autoRefresh}
+//               onCheckedChange={setAutoRefresh}
+//             />
+//           </div>
+//           <Select
+//             value={refreshInterval.toString()}
+//             onValueChange={(value) => setRefreshInterval(+value)}
+//           >
+//             <SelectTrigger className="w-24">
+//               <SelectValue />
+//             </SelectTrigger>
+//             <SelectContent>
+//               <SelectItem value="1">1s</SelectItem>
+//               <SelectItem value="5">5s</SelectItem>
+//               <SelectItem value="10">10s</SelectItem>
+//               <SelectItem value="30">30s</SelectItem>
+//             </SelectContent>
+//           </Select>
+//           <Button
+//             onClick={() => setIsMonitoring(!isMonitoring)}
+//             variant={isMonitoring ? 'destructive' : 'default'}
+//           >
+//             {isMonitoring ? (
+//               <Pause className="w-4 h-4 mr-2" />
+//             ) : (
+//               <Play className="w-4 h-4 mr-2" />
+//             )}
+//             {isMonitoring ? 'Stop' : 'Start'} Monitoring
+//           </Button>
+//         </div>
+//       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Live Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={realtimeData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="timestamp" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="threats"
-                  stroke="#ff6b6b"
-                  name="Threats"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="networks"
-                  stroke="#45b7d1"
-                  name="Networks"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+//       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//         <Card>
+//           <CardHeader>
+//             <CardTitle>Live Activity</CardTitle>
+//           </CardHeader>
+//           <CardContent>
+//             <ResponsiveContainer width="100%" height={250}>
+//               <LineChart data={realtimeData}>
+//                 <CartesianGrid strokeDasharray="3 3" />
+//                 <XAxis dataKey="timestamp" />
+//                 <YAxis />
+//                 <Tooltip />
+//                 <Legend />
+//                 <Line
+//                   type="monotone"
+//                   dataKey="threats"
+//                   stroke="#ff6b6b"
+//                   name="Threats"
+//                 />
+//                 <Line
+//                   type="monotone"
+//                   dataKey="networks"
+//                   stroke="#45b7d1"
+//                   name="Networks"
+//                 />
+//               </LineChart>
+//             </ResponsiveContainer>
+//           </CardContent>
+//         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Security Alerts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              { alerts.length === 0 ? (
-                <p className="text-muted-foreground">No alerts</p>
-              ) : (
-                alerts.map((alert) => (
-                  <motion.div
-                    key={alert.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded"
-                  >
-                    <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{alert.message}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {alert.timestamp.toLocaleTimeString()}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))
-              ) }
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+//         <Card>
+//           <CardHeader>
+//             <CardTitle>Security Alerts</CardTitle>
+//           </CardHeader>
+//           <CardContent>
+//             <div className="space-y-2 max-h-64 overflow-y-auto">
+//               { alerts.length === 0 ? (
+//                 <p className="text-muted-foreground">No alerts</p>
+//               ) : (
+//                 alerts.map((alert) => (
+//                   <motion.div
+//                     key={alert.id}
+//                     initial={{ opacity: 0, x: -20 }}
+//                     animate={{ opacity: 1, x: 0 }}
+//                     className="flex items-center gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded"
+//                   >
+//                     <AlertTriangle className="w-4 h-4 text-yellow-600" />
+//                     <div className="flex-1">
+//                       <p className="text-sm font-medium">{alert.message}</p>
+//                       <p className="text-xs text-muted-foreground">
+//                         {alert.timestamp.toLocaleTimeString()}
+//                       </p>
+//                     </div>
+//                   </motion.div>
+//                 ))
+//               ) }
+//             </div>
+//           </CardContent>
+//         </Card>
+//       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Monitoring Status</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {isMonitoring ? 'ACTIVE' : 'STOPPED'}
-              </div>
-              <p className="text-sm text-muted-foreground">Monitoring Status</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
-                {realtimeData.length > 0 ? realtimeData[realtimeData.length - 1]?.networks || 0 : 0}
-              </div>
-              <p className="text-sm text-muted-foreground">Active Networks</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-red-600">
-                {realtimeData.length > 0 ? realtimeData[realtimeData.length - 1]?.threats || 0 : 0}
-              </div>
-              <p className="text-sm text-muted-foreground">Threats Detected</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
-                {refreshInterval}s
-              </div>
-              <p className="text-sm text-muted-foreground">Refresh Interval</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
+//       <Card>
+//         <CardHeader>
+//           <CardTitle>Monitoring Status</CardTitle>
+//         </CardHeader>
+//         <CardContent>
+//           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+//             <div className="text-center">
+//               <div className="text-2xl font-bold text-green-600">
+//                 {isMonitoring ? 'ACTIVE' : 'STOPPED'}
+//               </div>
+//               <p className="text-sm text-muted-foreground">Monitoring Status</p>
+//             </div>
+//             <div className="text-center">
+//               <div className="text-2xl font-bold">
+//                 {realtimeData.length > 0 ? realtimeData[realtimeData.length - 1]?.networks || 0 : 0}
+//               </div>
+//               <p className="text-sm text-muted-foreground">Active Networks</p>
+//             </div>
+//             <div className="text-center">
+//               <div className="text-2xl font-bold text-red-600">
+//                 {realtimeData.length > 0 ? realtimeData[realtimeData.length - 1]?.threats || 0 : 0}
+//               </div>
+//               <p className="text-sm text-muted-foreground">Threats Detected</p>
+//             </div>
+//             <div className="text-center">
+//               <div className="text-2xl font-bold">
+//                 {refreshInterval}s
+//               </div>
+//               <p className="text-sm text-muted-foreground">Refresh Interval</p>
+//             </div>
+//           </div>
+//         </CardContent>
+//       </Card>
+//     </div>
+//   );
+// };
 
 // Mock data generators
 const generateMockNetworks = (): NetworkDevice[] => {

@@ -7,20 +7,30 @@ import com.cyberthreat.Response.LoginResponse;
 import com.cyberthreat.model.User;
 import com.cyberthreat.service.AuthenticationService;
 import com.cyberthreat.service.JwtService;
-
+import com.cyberthreat.repository.UserRepository; // Make sure this import exists
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import java.util.List;
+import java.util.Optional;
+
+
 
 @RequestMapping("/auth")
 @RestController
 public class AuthenticationController {
     private final JwtService jwtService;
-
     private final AuthenticationService authenticationService;
+    private final UserRepository userRepository; // ADD THIS FIELD
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService) {
+    // Update constructor to include UserRepository
+    public AuthenticationController(JwtService jwtService, 
+                                   AuthenticationService authenticationService,
+                                   UserRepository userRepository) { // ADD THIS PARAMETER
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
+        this.userRepository = userRepository; // INITIALIZE IT
     }
 
     @PostMapping("/signup")
@@ -56,4 +66,19 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+ @GetMapping("/profile")
+ public ResponseEntity<?> getProfile(Authentication authentication) {
+
+    if (authentication == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+    }
+    
+    String principal = authentication.getName();
+    userRepository.findByEmail(principal)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    List<User> allUsers = userRepository.findAll();
+    return ResponseEntity.ok(allUsers);
+  } 
 }

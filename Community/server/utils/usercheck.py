@@ -12,9 +12,6 @@ load_dotenv()
 # ------------------------
 def authenticate_request(request, need_user=False):
     token = request.headers.get('Authorization')
-    secret_key = request.headers.get('x-auth-app')
-    if not secret_key or secret_key != os.getenv('FRONTEND_SECRET'):
-        raise AuthenticationFailed('Invalid secret key!')
 
     if not need_user:
         return None

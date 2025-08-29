@@ -45,6 +45,12 @@ public class AuthenticationService {
         return userRepository.save(user);
     }
 
+    public Optional<User> getUserByEmail(String email) {
+    return userRepository.findByEmail(email);
+    
+    }
+
+
     public User authenticate(LoginUserDto input) {
         User user = userRepository.findByEmail(input.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));

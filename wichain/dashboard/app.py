@@ -24,14 +24,14 @@ logger = logging.getLogger("WiChain-Dashboard")
 
 # Set page config
 st.set_page_config(
-    page_title="WiChain Dashboard",
+    page_title="WiFi detection Dashboard",
     page_icon="📶",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # Title and description
-st.title("WiChain: Advanced Wi-Fi Spoofing Detection Dashboard")
+st.title("Wi-Fi Spoofing Detection Dashboard")
 st.markdown("""
 This dashboard provides real-time monitoring and detection of Wi-Fi spoofing attacks 
 using location-based detection, signal fingerprinting, and machine learning.
@@ -409,7 +409,8 @@ elif page == "Real-time Monitoring":
 
 # Footer
 st.markdown("---")
-st.markdown("WiChain - Combating Wi-Fi spoofing through advanced detection techniques")
+st.markdown("Wifi Detection"
+" - Combating Wi-Fi spoofing through advanced detection techniques")
 
 # Add a button to retrain the model
 if st.sidebar.button("Retrain Model"):

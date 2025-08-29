@@ -46,7 +46,6 @@ public class User implements UserDetails {
         return List.of();
     }
 
-    //TODO: add proper boolean checks
     @Override
     public boolean isAccountNonExpired() {
         return true;
