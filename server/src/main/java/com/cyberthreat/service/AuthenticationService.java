@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -48,6 +49,10 @@ public class AuthenticationService {
     public Optional<User> getUserByEmail(String email) {
     return userRepository.findByEmail(email);
     
+    }
+
+     public List<User> getAllUsers() {
+        return userRepository.findAll();  // returns list of all users
     }
 
 
