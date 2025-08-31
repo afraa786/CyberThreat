@@ -14,9 +14,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> allUsers() {
-        List<User> users = new ArrayList<>();
-        userRepository.findAll().forEach(users::add);
-        return users;
+     public List<User> allUsers() {
+        return userRepository.findAll();
     }
 }

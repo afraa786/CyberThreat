@@ -67,18 +67,4 @@ public class AuthenticationController {
         }
     }
 
- @GetMapping("/profile")
- public ResponseEntity<?> getProfile(Authentication authentication) {
-
-    if (authentication == null) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
-    }
-    
-    String principal = authentication.getName();
-    userRepository.findByEmail(principal)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-
-    List<User> allUsers = userRepository.findAll();
-    return ResponseEntity.ok(allUsers);
-  } 
 }

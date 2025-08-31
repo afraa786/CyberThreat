@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Navibar } from "../components/navbar";
 import { motion } from "framer-motion";
 import {
   User,
   Mail,
-  Phone,
-  MapPin,
   Edit3,
   Save,
   X,
@@ -14,112 +11,220 @@ import {
   Eye,
   EyeOff,
   Camera,
+  RefreshCw,
+  AlertCircle,
+  Key
 } from "lucide-react";
+
+// Define user type for TypeScript
+interface UserType {
+  id: string;
+  username: string;
+  email: string;
+  avatar?: string;
+  enabled: boolean;
+}
 
 const UserProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
-  const [allUsers, setAllUsers] = useState<any[]>([]); // Store all users
-  const [currentUser, setCurrentUser] = useState<any>(null); // Current logged-in user
-  const [tempData, setTempData] = useState<any>(null);
+  const [allUsers, setAllUsers] = useState<UserType[]>([]);
+  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+  const [tempData, setTempData] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  // ✅ fetch all users and find current user
-  useEffect(() => {
-    const fetchProfile = async () => {
+  // Helper function to extract error message
+  const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) {
+      return error.message;
+    } else if (typeof error === 'string') {
+      return error;
+    } else {
+      return 'An unknown error occurred';
+    }
+  };
+
+  // API service functions
+  const apiService = {
+    // Fetch current user
+    fetchCurrentUser: async (): Promise<UserType> => {
       try {
         const token = localStorage.getItem("jwtToken");
         if (!token) {
-          console.error("No token found");
-          setLoading(false);
-          return;
+          throw new Error("No authentication token found");
         }
 
-        const res = await fetch("http://localhost:8080/auth/profile", {
+        const response = await fetch("http://localhost:8080/users/me", {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
 
-        if (!res.ok) throw new Error("Failed to fetch profile");
-
-        const usersData = await res.json();
-        setAllUsers(usersData);
-        
-        // Get current user's email from token or localStorage
-        const userEmail = localStorage.getItem("userEmail") || "shaikhafraabi@gmail.com"; // Fallback for demo
-        
-        // Find current user in the list
-        const foundUser = usersData.find((user: any) => user.email === userEmail);
-        
-        if (foundUser) {
-          setCurrentUser(foundUser);
-          setTempData(foundUser);
-        } else {
-          // Fallback: use first user if current not found
-          setCurrentUser(usersData[0]);
-          setTempData(usersData[0]);
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}: ${response.statusText}`);
         }
+
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        const message = getErrorMessage(error);
+        console.error("API Error:", message);
+        throw new Error(`Failed to fetch user: ${message}`);
+      }
+    },
+
+    // Fetch all users
+    fetchAllUsers: async (): Promise<UserType[]> => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) {
+          throw new Error("No authentication token found");
+        }
+
+        const response = await fetch("http://localhost:8080/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        const message = getErrorMessage(error);
+        console.error("API Error:", message);
+        throw new Error(`Failed to fetch users: ${message}`);
+      }
+    },
+
+    // Update user
+    updateUser: async (userData: UserType): Promise<UserType> => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) {
+          throw new Error("No authentication token found");
+        }
+
+        const response = await fetch("http://localhost:8080/auth/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(userData),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        const message = getErrorMessage(error);
+        console.error("API Error:", message);
+        throw new Error(`Failed to update user: ${message}`);
+      }
+    },
+  };
+
+  // Fetch data with retry logic
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const [userData, usersData] = await Promise.all([
+          apiService.fetchCurrentUser(),
+          apiService.fetchAllUsers(),
+        ]);
+        
+        setCurrentUser(userData);
+        setTempData(userData);
+        setAllUsers(usersData);
       } catch (err) {
-        console.error("Error loading profile", err);
+        const message = getErrorMessage(err);
+        setError(message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfile();
-  }, []);
+    fetchData();
+  }, [retryCount]);
+
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1);
+  };
 
   const handleEdit = () => {
     setIsEditing(true);
-    setTempData({ ...currentUser });
+    setTempData(currentUser ? {...currentUser} : null);
   };
 
   const handleSave = async () => {
+    if (!tempData) return;
+    
     try {
-      const token = localStorage.getItem("jwtToken");
-      if (!token) return;
-
-      const res = await fetch("http://localhost:8080/auth/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(tempData),
-      });
-
-      if (!res.ok) throw new Error("Failed to save profile");
-
-      const updatedUsers = await res.json();
-      setAllUsers(updatedUsers);
-      
-      // Update current user from the updated list
-      const updatedCurrentUser = updatedUsers.find((user: any) => user.email === currentUser.email);
-      if (updatedCurrentUser) {
-        setCurrentUser(updatedCurrentUser);
-      }
-      
+      setLoading(true);
+      const updatedUser = await apiService.updateUser(tempData);
+      setCurrentUser(updatedUser);
       setIsEditing(false);
+      setError(null);
     } catch (err) {
-      console.error("Save failed", err);
+      const message = getErrorMessage(err);
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    setTempData({ ...currentUser });
+    setTempData(currentUser ? {...currentUser} : null);
     setIsEditing(false);
+    setError(null);
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setTempData({ ...tempData, [field]: value });
+  const handleInputChange = (field: keyof UserType, value: string) => {
+    if (tempData) {
+      setTempData({ ...tempData, [field]: value });
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-900 text-white">
-        Loading profile...
+      <div className="min-h-screen flex flex-col items-center justify-center bg-neutral-900 text-white">
+        <RefreshCw className="w-12 h-12 animate-spin mb-4 text-emerald-400" />
+        <p>Loading profile data...</p>
+      </div>
+    );
+  }
+
+  if (error && !currentUser) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-neutral-900 p-6">
+        <div className="max-w-md w-full bg-gray-800/50 border border-gray-700 rounded-lg p-6 text-center">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">Connection Error</h2>
+          <p className="text-gray-300 mb-2">We couldn't fetch your profile data.</p>
+          <p className="text-red-400 mb-6">{error}</p>
+          <button
+            onClick={handleRetry}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center"
+          >
+            <RefreshCw className="w-5 h-5 mr-2" />
+            Retry Connection
+          </button>
+        </div>
       </div>
     );
   }
@@ -132,9 +237,16 @@ const UserProfilePage = () => {
     );
   }
 
-  // ✅ Profile Section using current user data
+  // Profile Section using current user data
   const ProfileSection = () => (
     <div className="space-y-6">
+      {error && (
+        <div className="bg-red-900/50 border border-red-700 rounded-lg p-4 text-red-200 flex items-start">
+          <AlertCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+      
       <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
         <div className="flex items-center space-x-6">
           <div className="relative">
@@ -158,13 +270,13 @@ const UserProfilePage = () => {
 
           <div className="flex-1">
             <h2 className="text-2xl font-bold text-white mb-1">
-              {currentUser.username}
+              {currentUser.username || "No username"}
             </h2>
             <p className="text-gray-400 text-sm mb-3">
-              {currentUser.email}
+              {currentUser.email || "No email"}
             </p>
             <p className="text-gray-400 text-sm mb-3">
-              User ID: {currentUser.id}
+              User ID: {currentUser.id || "N/A"}
             </p>
             {!isEditing ? (
               <button
@@ -211,14 +323,14 @@ const UserProfilePage = () => {
             {isEditing ? (
               <input
                 type="text"
-                value={tempData.username || ""}
+                value={tempData?.username || ""}
                 onChange={(e) => handleInputChange("username", e.target.value)}
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white"
               />
             ) : (
               <div className="flex items-center space-x-3 p-3 bg-gray-700/50 rounded-lg">
                 <User className="w-5 h-5 text-gray-400" />
-                <span className="text-white">{currentUser.username}</span>
+                <span className="text-white">{currentUser.username || "No username"}</span>
               </div>
             )}
           </div>
@@ -231,14 +343,14 @@ const UserProfilePage = () => {
             {isEditing ? (
               <input
                 type="email"
-                value={tempData.email || ""}
+                value={tempData?.email || ""}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white"
               />
             ) : (
               <div className="flex items-center space-x-3 p-3 bg-gray-700/50 rounded-lg">
                 <Mail className="w-5 h-5 text-gray-400" />
-                <span className="text-white">{currentUser.email}</span>
+                <span className="text-white">{currentUser.email || "No email"}</span>
               </div>
             )}
           </div>
@@ -249,7 +361,8 @@ const UserProfilePage = () => {
               User ID
             </label>
             <div className="flex items-center space-x-3 p-3 bg-gray-700/50 rounded-lg">
-              <span className="text-white">{currentUser.id}</span>
+              <Key className="w-5 h-5 text-gray-400" />
+              <span className="text-white">{currentUser.id || "N/A"}</span>
             </div>
           </div>
 
@@ -267,26 +380,39 @@ const UserProfilePage = () => {
         </div>
       </div>
 
-      {/* All Users List (for debugging) */}
+      {/* All Users List */}
       <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">
-          All Users in System ({allUsers.length})
-        </h3>
-        <div className="space-y-2">
-          {allUsers.map((user) => (
-            <div key={user.id} className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
-              <div>
-                <span className="text-white font-medium">{user.username}</span>
-                <span className="text-gray-400 text-sm ml-3">({user.email})</span>
-              </div>
-              <span className={`px-2 py-1 rounded text-xs ${
-                user.enabled ? "bg-green-600 text-white" : "bg-red-600 text-white"
-              }`}>
-                {user.enabled ? "Active" : "Inactive"}
-              </span>
-            </div>
-          ))}
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-white">
+            All Users in System ({allUsers.length})
+          </h3>
+          <button 
+            onClick={handleRetry}
+            className="flex items-center text-sm text-emerald-400 hover:text-emerald-300"
+          >
+            <RefreshCw className="w-4 h-4 mr-1" />
+            Refresh
+          </button>
         </div>
+        {allUsers.length === 0 ? (
+          <p className="text-gray-400">No users found</p>
+        ) : (
+          <div className="space-y-2">
+            {allUsers.map((user) => (
+              <div key={user.id} className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+                <div>
+                  <span className="text-white font-medium">{user.username || "No username"}</span>
+                  <span className="text-gray-400 text-sm ml-3">({user.email || "No email"})</span>
+                </div>
+                <span className={`px-2 py-1 rounded text-xs ${
+                  user.enabled ? "bg-green-600 text-white" : "bg-red-600 text-white"
+                }`}>
+                  {user.enabled ? "Active" : "Inactive"}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -354,8 +480,6 @@ const UserProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white">
-      <Navibar />
-
       <div className="container mx-auto px-6 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
