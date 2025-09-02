@@ -40,9 +40,9 @@ class WiChainDetector:
         try:
             with open(path, "r") as f:
                 self.OUI_DATA = json.load(f)
-            print(f"✅ Loaded {len(self.OUI_DATA)} OUIs")
+            print(f"Loaded {len(self.OUI_DATA)} OUIs")
         except FileNotFoundError:
-            print(f"⚠️ OUI file not found at {path}")
+            print(f" OUI file not found at {path}")
             # Try alternative path
             alt_path = r"C:\Users\Afraa\Downloads\wichain\oui.json"
             try:
@@ -50,10 +50,10 @@ class WiChainDetector:
                     self.OUI_DATA = json.load(f)
                 print(f"✅ Loaded {len(self.OUI_DATA)} OUIs from alternative path")
             except Exception as e:
-                print(f"⚠️ Failed to load OUI data from alternative path: {e}")
+                print(f"Failed to load OUI data from alternative path: {e}")
                 self.OUI_DATA = {}
         except Exception as e:
-            print(f"⚠️ Failed to load OUI data: {e}")
+            print(f"Failed to load OUI data: {e}")
             self.OUI_DATA = {}
 
     def load_real_data(self, file_path):
