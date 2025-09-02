@@ -16,29 +16,21 @@ import WiChainDashboard from "./components/scan.tsx";
 import Profile from "./pages/Profile.tsx";
 import Community from "./components/community.tsx";
 import Email from "./components/email.tsx";
-import Check from "./components/check.tsx";
-import Map from "./components/map.tsx";
+//import Check from "./components/check.tsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <AuthPage />,
   },
-  {
-    path: "/map",
-    element: (
-      <ProtectedRoute>
-        <Map />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/check",
-    element: (
-      <ProtectedRoute>
-        <Check />
-      </ProtectedRoute>
-    ),
-  },
+  // {
+  //   path: "/check",
+  //   element: (
+  //     <ProtectedRoute>
+  //       <Check />
+  //     </ProtectedRoute>
+  //   ),
+  // },
   {
   path: "/wifi",
   element: (

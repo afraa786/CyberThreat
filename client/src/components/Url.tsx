@@ -1,8 +1,20 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import {Navibar} from './navbar';
-import { ArrowLeft, Shield, AlertTriangle, ExternalLink, Search, Lock, Unlock, Globe, Clock, CheckCircle, XCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { Navibar } from "./navbar";
+import {
+  ArrowLeft,
+  Shield,
+  AlertTriangle,
+  ExternalLink,
+  Search,
+  Lock,
+  Unlock,
+  Globe,
+  Clock,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 
 interface AnalysisResult {
   url: string;
@@ -15,82 +27,82 @@ interface AnalysisResult {
 
 const URLAnalyzer: React.FC = () => {
   const navigate = useNavigate();
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-const analyzeURL = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!url.trim()) return;
+  const analyzeURL = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!url.trim()) return;
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    const response = await fetch('http://127.0.0.1:5000/predict', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ url: url.trim() }),
-    });
+    try {
+      const response = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: url.trim() }),
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to analyze URL');
+      if (!response.ok) {
+        throw new Error("Failed to analyze URL");
+      }
+
+      const data = await response.json();
+
+      const threats =
+        data.prediction === "phishing"
+          ? ["Potential phishing detected", "Malicious patterns found"]
+          : ["No phishing detected", "Secure domain"];
+
+      setResult({
+        url: url.trim(),
+        score: data.probabilities.safe, // use "safe" probability for frontend confidence
+        analyzed: true,
+        threats: threats,
+        domain: new URL(url.trim()).hostname,
+        timestamp: new Date().toLocaleString(),
+      });
+    } catch (error) {
+      console.error("Error analyzing URL:", error);
+      alert("Error connecting to backend: " + error);
+    } finally {
+      setIsLoading(false);
     }
-
-    const data = await response.json();
-
-    const threats = data.prediction === "phishing"
-      ? ['Potential phishing detected', 'Malicious patterns found']
-      : ['No phishing detected', 'Secure domain'];
-
-    setResult({
-      url: url.trim(),
-      score: data.probabilities.safe, // use "safe" probability for frontend confidence
-      analyzed: true,
-      threats: threats,
-      domain: new URL(url.trim()).hostname,
-      timestamp: new Date().toLocaleString(),
-    });
-  } catch (error) {
-    console.error('Error analyzing URL:', error);
-    alert('Error connecting to backend: ' + error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   const openURL = () => {
     if (result?.url) {
-      window.open(result.url, '_blank');
+      window.open(result.url, "_blank");
     }
   };
 
   const getDisplayPercentage = () => {
     if (!result) return 0;
     let num = result.score * 100;
-    if (result.score >= 0 && result.score < 0.50) {
+    if (result.score >= 0 && result.score < 0.5) {
       num = 100 - num;
     }
     return Math.round(num);
   };
 
   const isSafe = () => {
-    return result && result.score >= 0.50;
+    return result && result.score >= 0.5;
   };
 
   const getSafetyMessage = () => {
-    if (!result) return '';
+    if (!result) return "";
     const percentage = getDisplayPercentage();
-    return isSafe() ? 
-      `Website is ${percentage}% safe to use` : 
-      `Website is ${percentage}% unsafe to use`;
+    return isSafe()
+      ? `Website is ${percentage}% safe to use`
+      : `Website is ${percentage}% unsafe to use`;
   };
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <Navibar/>
+      <Navibar />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -104,28 +116,31 @@ const analyzeURL = async (e: React.FormEvent) => {
           <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
           <span>Back to Dashboard</span>
         </button> */}
-        
+
         <div className="flex items-center space-x-3 mb-4">
           <div className="relative">
             <Shield className="h-8 w-8 text-emerald-400" />
             <motion.div
-              animate={{ 
+              animate={{
                 scale: [1, 1.2, 1],
-                opacity: [0.7, 1, 0.7]
+                opacity: [0.7, 1, 0.7],
               }}
-              transition={{ 
+              transition={{
                 duration: 2,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
               className="absolute -top-1 -right-1 h-3 w-3 bg-emerald-400 rounded-full"
             />
           </div>
-          <h1 className="text-3xl font-bold text-neutral-100">URL Security Analyzer</h1>
+          <h1 className="text-3xl font-bold text-neutral-100">
+            URL Security Analyzer
+          </h1>
         </div>
-        
+
         <p className="text-neutral-400 text-lg">
-          Analyze any URL for potential phishing threats and security risks using our advanced AI detection system.
+          Analyze any URL for potential phishing threats and security risks
+          using our advanced AI detection system.
         </p>
       </motion.div>
 
@@ -139,13 +154,13 @@ const analyzeURL = async (e: React.FormEvent) => {
           className="relative rounded-2xl bg-neutral-800/50 p-8 backdrop-blur-sm border border-neutral-700/50 shadow-2xl"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
-          
+
           <div className="relative z-10">
             <h2 className="text-xl font-semibold text-neutral-100 mb-6 flex items-center space-x-2">
               <Search className="h-5 w-5 text-emerald-400" />
               <span>URL Analysis</span>
             </h2>
-            
+
             <form onSubmit={analyzeURL} className="space-y-6">
               <div className="relative">
                 <input
@@ -158,7 +173,7 @@ const analyzeURL = async (e: React.FormEvent) => {
                 />
                 <Globe className="absolute right-4 top-4 h-5 w-5 text-neutral-500" />
               </div>
-              
+
               <motion.button
                 type="submit"
                 disabled={isLoading || !url.trim()}
@@ -172,7 +187,11 @@ const analyzeURL = async (e: React.FormEvent) => {
                     <>
                       <motion.div
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
                         className="rounded-full h-5 w-5 border-2 border-neutral-900 border-t-transparent"
                       />
                       <span>Analyzing Security...</span>
@@ -197,18 +216,22 @@ const analyzeURL = async (e: React.FormEvent) => {
           className="relative rounded-2xl bg-neutral-800/50 p-8 backdrop-blur-sm border border-neutral-700/50 shadow-2xl"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
-          
+
           <div className="relative z-10">
             <h2 className="text-xl font-semibold text-neutral-100 mb-6 flex items-center space-x-2">
               <AlertTriangle className="h-5 w-5 text-emerald-400" />
               <span>Security Analysis Results</span>
             </h2>
-            
+
             {!result ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <motion.div
                   animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                   className="w-16 h-16 rounded-full bg-neutral-700/50 flex items-center justify-center mb-4"
                 >
                   <Search className="h-8 w-8 text-neutral-500" />
@@ -226,21 +249,25 @@ const analyzeURL = async (e: React.FormEvent) => {
                 {/* URL Details */}
                 <div className="grid gap-4">
                   <div className="p-4 bg-neutral-900/50 rounded-xl border border-neutral-600">
-                    <p className="text-sm text-neutral-400 mb-1">Analyzed URL:</p>
-                    <a 
-                      href={result.url} 
-                      target="_blank" 
+                    <p className="text-sm text-neutral-400 mb-1">
+                      Analyzed URL:
+                    </p>
+                    <a
+                      href={result.url}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-emerald-400 hover:text-emerald-300 font-mono text-sm break-all underline"
                     >
                       {result.url}
                     </a>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-neutral-900/50 rounded-xl border border-neutral-600">
                       <p className="text-sm text-neutral-400 mb-1">Domain:</p>
-                      <p className="text-neutral-100 font-mono text-sm">{result.domain}</p>
+                      <p className="text-neutral-100 font-mono text-sm">
+                        {result.domain}
+                      </p>
                     </div>
                     <div className="p-4 bg-neutral-900/50 rounded-xl border border-neutral-600">
                       <p className="text-sm text-neutral-400 mb-1">Analyzed:</p>
@@ -251,15 +278,15 @@ const analyzeURL = async (e: React.FormEvent) => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Safety Score */}
                 <motion.div
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
                   className={`p-6 rounded-xl border-2 ${
-                    isSafe() 
-                      ? 'bg-emerald-900/20 border-emerald-500/50' 
-                      : 'bg-red-900/20 border-red-500/50'
+                    isSafe()
+                      ? "bg-emerald-900/20 border-emerald-500/50"
+                      : "bg-red-900/20 border-red-500/50"
                   }`}
                 >
                   <div className="flex items-center space-x-3 mb-4">
@@ -269,33 +296,35 @@ const analyzeURL = async (e: React.FormEvent) => {
                       <XCircle className="h-8 w-8 text-red-400" />
                     )}
                     <div>
-                      <h3 className={`text-xl font-bold ${
-                        isSafe() ? 'text-emerald-400' : 'text-red-400'
-                      }`}>
-                        {getDisplayPercentage()}% {isSafe() ? 'Safe' : 'Unsafe'}
+                      <h3
+                        className={`text-xl font-bold ${
+                          isSafe() ? "text-emerald-400" : "text-red-400"
+                        }`}
+                      >
+                        {getDisplayPercentage()}% {isSafe() ? "Safe" : "Unsafe"}
                       </h3>
-                      <p className="text-neutral-300">
-                        {getSafetyMessage()}
-                      </p>
+                      <p className="text-neutral-300">{getSafetyMessage()}</p>
                     </div>
                   </div>
-                  
+
                   {/* Progress Bar */}
                   <div className="w-full bg-neutral-700 rounded-full h-3 mb-4">
-                    <motion.div 
+                    <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${getDisplayPercentage()}%` }}
                       transition={{ duration: 1, ease: "easeOut" }}
                       className={`h-3 rounded-full ${
-                        isSafe() ? 'bg-emerald-500' : 'bg-red-500'
+                        isSafe() ? "bg-emerald-500" : "bg-red-500"
                       }`}
                     />
                   </div>
                 </motion.div>
-                
+
                 {/* Threat Analysis */}
                 <div className="p-6 bg-neutral-900/30 rounded-xl border border-neutral-600">
-                  <h4 className="text-lg font-semibold text-neutral-100 mb-4">Threat Analysis</h4>
+                  <h4 className="text-lg font-semibold text-neutral-100 mb-4">
+                    Threat Analysis
+                  </h4>
                   <div className="space-y-2">
                     {result.threats.map((threat, index) => (
                       <motion.div
@@ -310,12 +339,14 @@ const analyzeURL = async (e: React.FormEvent) => {
                         ) : (
                           <XCircle className="h-4 w-4 text-red-400" />
                         )}
-                        <span className="text-neutral-300 text-sm">{threat}</span>
+                        <span className="text-neutral-300 text-sm">
+                          {threat}
+                        </span>
                       </motion.div>
                     ))}
                   </div>
                 </div>
-                
+
                 {/* Action Button */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -323,14 +354,18 @@ const analyzeURL = async (e: React.FormEvent) => {
                   onClick={openURL}
                   className={`group w-full py-4 px-6 font-semibold rounded-xl transition-all duration-300 relative overflow-hidden shadow-lg ${
                     isSafe()
-                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-neutral-900 hover:from-emerald-400 hover:to-emerald-500 shadow-emerald-500/20'
-                      : 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-400 hover:to-red-500 shadow-red-500/20'
+                      ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-neutral-900 hover:from-emerald-400 hover:to-emerald-500 shadow-emerald-500/20"
+                      : "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-400 hover:to-red-500 shadow-red-500/20"
                   }`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
                   <span className="relative flex items-center justify-center space-x-2">
                     <ExternalLink className="h-5 w-5" />
-                    <span>{isSafe() ? 'Continue to Website' : 'Proceed with Caution'}</span>
+                    <span>
+                      {isSafe()
+                        ? "Continue to Website"
+                        : "Proceed with Caution"}
+                    </span>
                   </span>
                 </motion.button>
               </motion.div>
@@ -338,6 +373,218 @@ const analyzeURL = async (e: React.FormEvent) => {
           </div>
         </motion.div>
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="mt-12 relative rounded-2xl bg-neutral-800/50 p-8 backdrop-blur-sm border border-neutral-700/50 shadow-2xl"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
+
+        <div className="relative z-10">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-neutral-100 mb-4">
+              How This Works
+            </h2>
+            <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
+              Our advanced AI system analyzes URLs through multiple layers of
+              security checks to detect phishing attempts and malicious
+              websites.
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto space-y-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="flex items-start space-x-6 p-6 bg-neutral-900/30 rounded-xl border border-neutral-600 group hover:border-emerald-500/30 transition-all duration-300"
+            >
+              <div className="flex-shrink-0">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-xl border border-emerald-500/30 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 to-transparent rounded-xl"></div>
+                    <div className="relative z-10">
+                      <Globe className="h-8 w-8 text-emerald-400" />
+                    </div>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-500 text-neutral-900 rounded-full flex items-center justify-center font-bold text-sm">
+                    1
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-neutral-100 mb-3">
+                  Enter URL
+                </h3>
+                <p className="text-neutral-400 leading-relaxed">
+                  Paste any website URL into the input field above. Our system
+                  accepts all standard web addresses including HTTP and HTTPS
+                  protocols. Simply copy and paste the suspicious URL you want
+                  to analyze for potential security threats.
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="flex items-start space-x-6 p-6 bg-neutral-900/30 rounded-xl border border-neutral-600 group hover:border-emerald-500/30 transition-all duration-300"
+            >
+              <div className="flex-shrink-0">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-xl border border-emerald-500/30 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 to-transparent rounded-xl"></div>
+                    <div className="relative z-10">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      >
+                        <Shield className="h-8 w-8 text-emerald-400" />
+                      </motion.div>
+                    </div>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-500 text-neutral-900 rounded-full flex items-center justify-center font-bold text-sm">
+                    2
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-neutral-100 mb-3">
+                  AI Analysis
+                </h3>
+                <p className="text-neutral-400 leading-relaxed">
+                  Our advanced machine learning model examines URL patterns,
+                  domain reputation, and suspicious characteristics using
+                  state-of-the-art threat intelligence. The AI analyzes multiple
+                  factors including domain age, SSL certificates, and known
+                  phishing indicators.
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="flex items-start space-x-6 p-6 bg-neutral-900/30 rounded-xl border border-neutral-600 group hover:border-emerald-500/30 transition-all duration-300"
+            >
+              <div className="flex-shrink-0">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-xl border border-emerald-500/30 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 to-transparent rounded-xl"></div>
+                    <div className="relative z-10">
+                      <div className="relative">
+                        <CheckCircle className="h-8 w-8 text-emerald-400" />
+                        <motion.div
+                          animate={{
+                            scale: [1, 1.3, 1],
+                            opacity: [0.7, 1, 0.7],
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                          className="absolute inset-0"
+                        >
+                          <CheckCircle className="h-8 w-8 text-emerald-400/50" />
+                        </motion.div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-500 text-neutral-900 rounded-full flex items-center justify-center font-bold text-sm">
+                    3
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-neutral-100 mb-3">
+                  Risk Assessment
+                </h3>
+                <p className="text-neutral-400 leading-relaxed">
+                  Receive a comprehensive safety score with detailed threat
+                  analysis and specific risk indicators. The system provides a
+                  percentage-based safety rating along with identified threats
+                  and recommendations for informed decision making.
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.0 }}
+              className="flex items-start space-x-6 p-6 bg-neutral-900/30 rounded-xl border border-neutral-600 group hover:border-emerald-500/30 transition-all duration-300"
+            >
+              <div className="flex-shrink-0">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-xl border border-emerald-500/30 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 to-transparent rounded-xl"></div>
+                    <div className="relative z-10">
+                      <Lock className="h-8 w-8 text-emerald-400" />
+                    </div>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-500 text-neutral-900 rounded-full flex items-center justify-center font-bold text-sm">
+                    4
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-neutral-100 mb-3">
+                  Safe Browsing Decision
+                </h3>
+                <p className="text-neutral-400 leading-relaxed">
+                  Make informed decisions about website safety based on our
+                  analysis. For safe sites, proceed with confidence using the
+                  "Continue to Website" button. For risky URLs, exercise caution
+                  and consider avoiding the site altogether.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+            className="mt-12 p-6 bg-neutral-900/50 rounded-xl border border-neutral-600 text-center"
+          >
+            <div className="flex flex-col items-center space-y-4">
+              <AlertTriangle className="h-6 w-6 text-amber-400" />
+              <div>
+                <h4 className="text-lg font-semibold text-neutral-100 mb-4">
+                  Advanced Protection Features
+                </h4>
+                <div className="grid md:grid-cols-2 gap-4 text-sm text-neutral-300 max-w-2xl mx-auto">
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                    <span>Real-time phishing detection</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                    <span>Domain reputation analysis</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                    <span>Suspicious pattern recognition</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                    <span>Threat intelligence integration</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
     </div>
   );
 };

@@ -10,53 +10,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 
-const CursorFollower = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isVisible, setIsVisible] = useState(true);
-
-  useEffect(() => {
-    const updatePosition = (e) => {
-      setPosition({ x: e.clientX, y: e.clientY });
-    };
-    const handleMouseEnter = () => setIsVisible(true);
-    const handleMouseLeave = () => setIsVisible(false);
-    document.addEventListener("mousemove", updatePosition);
-    document.addEventListener("mouseenter", handleMouseEnter);
-    document.addEventListener("mouseleave", handleMouseLeave);
-    setIsVisible(true);
-    return () => {
-      document.removeEventListener("mousemove", updatePosition);
-      document.removeEventListener("mouseenter", handleMouseEnter);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-    };
-  }, []);
-
-  return (
-    <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference"
-      style={{
-        x: position.x - 10,
-        y: position.y - 10,
-        opacity: isVisible ? 1 : 0,
-      }}
-      animate={{
-        x: position.x - 10,
-        y: position.y - 10,
-      }}
-      transition={{
-        type: "spring",
-        damping: 25,
-        stiffness: 400,
-        mass: 0.1,
-      }}
-    >
-      <div className="w-5 h-5 bg-white rounded-full shadow-lg">
-        <div className="w-full h-full bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-full animate-pulse" />
-      </div>
-    </motion.div>
-  );
-};
-
 export function Navibar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -95,106 +48,188 @@ export function Navibar() {
 
   return (
     <div className="w-full top-0 left-0 z-40 bg-neutral-900/80 backdrop-blur-sm">
-      <CursorFollower />
       <div className="container mx-auto p-4 md:p-8">
         <div className="Navbar">
-          <div className="relative mb-6 flex items-center justify-between rounded-2xl bg-neutral-800/50 p-3 backdrop-blur-sm border border-neutral-700/50 shadow-2xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
-            <div className="relative z-10 flex items-center space-x-8">
-              <div className="flex items-center space-x-2">
+          <div className="relative mb-6 flex items-center justify-between rounded-2xl bg-neutral-800/50 p-3 backdrop-blur-sm">
+            <div className="flex items-center min-w-0 flex-1">
+              <div className="flex items-center space-x-2 flex-shrink-0">
                 <div className="relative"></div>
               </div>
-              <nav className="hidden md:block">
-                <ul className="flex space-x-6">
-                  <li className="group relative">
+
+              <nav className="hidden lg:block flex-1 mx-4">
+                <ul className="flex items-center justify-center space-x-3 xl:space-x-4">
+                  <li className="group relative flex-shrink-0">
                     <button
                       onClick={() => navigate("/home")}
-                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                      className="flex items-center px-2 py-1 text-sm xl:text-base text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
                     >
                       <span>Home</span>
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-                  <li className="group relative">
+                  <li className="group relative flex-shrink-0">
                     <button
                       onClick={() => navigate("/community")}
-                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                      className="flex items-center px-2 py-1 text-sm xl:text-base text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
                     >
                       <span>Community</span>
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-                  <li className="group relative">
+                  <li className="group relative flex-shrink-0">
                     <button
                       onClick={() => navigate("/threat")}
-                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                      className="flex items-center px-2 py-1 text-sm xl:text-base text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
                     >
-                      <span>Report a threat</span>
+                      <span>Report Threat</span>
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-                  <li className="group relative">
+                  <li className="group relative flex-shrink-0">
                     <button
                       onClick={() => navigate("/url")}
-                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                      className="flex items-center px-2 py-1 text-sm xl:text-base text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
                     >
-                      <span>Scan a Link</span>
+                      <span>Scan Link</span>
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-                  <li className="group relative">
+                  <li className="group relative flex-shrink-0">
                     <button
                       onClick={() => navigate("/wifi")}
-                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                      className="flex items-center px-2 py-1 text-sm xl:text-base text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
                     >
-                      <span>Scan a WiFi Network</span>
+                      <span>Scan WiFi</span>
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-                  <li className="group relative">
+                  <li className="group relative flex-shrink-0">
                     <button
                       onClick={() => navigate("/token")}
-                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                      className="flex items-center px-2 py-1 text-sm xl:text-base text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
                     >
-                      <span>For Developers</span>
+                      <span>Developers</span>
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-                  <li className="group relative">
+                  <li className="group relative flex-shrink-0">
                     <button
                       onClick={() => navigate("/faqs")}
-                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                      className="flex items-center px-2 py-1 text-sm xl:text-base text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
                     >
                       <span>FAQs</span>
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
+                  <li className="group relative flex-shrink-0">
+                    <button
+                      onClick={() => navigate("/email")}
+                      className="flex items-center px-2 py-1 text-sm xl:text-base text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
+                    >
+                      <span>Password</span>
+                    </button>
+                    <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
+                  </li>
                 </ul>
               </nav>
+
+              {/* Mobile menu for medium screens */}
+              <nav className="hidden md:block lg:hidden flex-1 mx-4">
+                <ul className="flex items-center justify-center space-x-2">
+                  <li className="group relative">
+                    <button
+                      onClick={() => navigate("/home")}
+                      className="px-1 py-1 text-xs text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
+                    >
+                      Home
+                    </button>
+                  </li>
+                  <li className="group relative">
+                    <button
+                      onClick={() => navigate("/community")}
+                      className="px-1 py-1 text-xs text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
+                    >
+                      Community
+                    </button>
+                  </li>
+                  <li className="group relative">
+                    <button
+                      onClick={() => navigate("/threat")}
+                      className="px-1 py-1 text-xs text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
+                    >
+                      Report
+                    </button>
+                  </li>
+                  <li className="group relative">
+                    <button
+                      onClick={() => navigate("/url")}
+                      className="px-1 py-1 text-xs text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
+                    >
+                      URL
+                    </button>
+                  </li>
+                  <li className="group relative">
+                    <button
+                      onClick={() => navigate("/wifi")}
+                      className="px-1 py-1 text-xs text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
+                    >
+                      WiFi
+                    </button>
+                  </li>
+                  <li className="group relative">
+                    <button
+                      onClick={() => navigate("/token")}
+                      className="px-1 py-1 text-xs text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
+                    >
+                      Dev
+                    </button>
+                  </li>
+                  <li className="group relative">
+                    <button
+                      onClick={() => navigate("/faqs")}
+                      className="px-1 py-1 text-xs text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
+                    >
+                      FAQ
+                    </button>
+                  </li>
+                  <li className="group relative">
+                    <button
+                      onClick={() => navigate("/email")}
+                      className="px-1 py-1 text-xs text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
+                    >
+                      Pass
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+
               <button
-                className="md:hidden text-emerald-400"
+                className="md:hidden lg:hidden text-emerald-400"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 <Menu className="h-6 w-6" />
               </button>
             </div>
-            <div className="relative z-10 flex items-center space-x-3">
+
+            <div className="flex items-center space-x-2 flex-shrink-0">
               <button className="flex items-center justify-center rounded-full bg-emerald-400/10 p-2 text-emerald-400 transition-all hover:bg-emerald-400/20">
-                <Shield className="h-5 w-5" />
+                <Shield className="h-4 w-4 xl:h-5 xl:w-5" />
               </button>
+
               <motion.button
                 onClick={() => navigate("/chatbot")}
-                className="group relative overflow-hidden rounded-full px-8 py-3 transition-all duration-300 hover:scale-110 focus:scale-110 active:scale-100"
-                whileHover={{ scale: 1.1 }}
+                className="group relative overflow-hidden rounded-full px-4 xl:px-6 py-2 xl:py-3 transition-all duration-300 hover:scale-105 focus:scale-105 active:scale-95"
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <div className="relative rounded-full bg-neutral-900 px-6 py-2 transition-all duration-300 group-hover:bg-neutral-800">
+                <div className="relative rounded-full bg-neutral-900 px-3 xl:px-4 py-1 xl:py-2 transition-all duration-300 group-hover:bg-neutral-800">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-500/10 via-transparent to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative flex items-center justify-center space-x-3">
+
+                  <div className="relative flex items-center justify-center space-x-1 xl:space-x-2">
                     <motion.svg
                       fill="none"
                       viewBox="0 0 24 24"
-                      className="w-5 h-5 text-emerald-400 group-hover:text-cyan-400 transition-colors duration-300"
+                      className="w-4 h-4 xl:w-5 xl:h-5 text-emerald-400 group-hover:text-cyan-400 transition-colors duration-300"
                       animate={{
                         rotate: [0, 180, 360],
                         scale: [1, 1.2, 1],
@@ -221,8 +256,9 @@ export function Navibar() {
                         d="M6.5 4L6.303 4.5915C6.24777 4.75718 6.15472 4.90774 6.03123 5.03123C5.90774 5.15472 5.75718 5.24777 5.5915 5.303L5 5.5L5.5915 5.697C5.75718 5.75223 5.90774 5.84528 6.03123 5.96877C6.15472 5.84528 6.24282 5.75223 6.4085 5.697L7 5.5L6.4085 5.303C6.24282 5.24777 6.09226 5.15472 5.96877 5.03123C5.84528 4.90774 5.75223 4.75718 5.697 4.5915L6.5 4Z"
                       />
                     </motion.svg>
+
                     <motion.span
-                      className="text-base font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent group-hover:from-cyan-400 group-hover:to-emerald-400 transition-all duration-300"
+                      className="text-sm xl:text-base font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent group-hover:from-cyan-400 group-hover:to-emerald-400 transition-all duration-300"
                       animate={{
                         backgroundPosition: ["0%", "100%", "0%"],
                       }}
@@ -234,6 +270,7 @@ export function Navibar() {
                     >
                       AstraAI
                     </motion.span>
+
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                       {[...Array(6)].map((_, i) => (
                         <motion.div
@@ -260,93 +297,122 @@ export function Navibar() {
                   </div>
                 </div>
               </motion.button>
+
+              {/* Mobile/Tablet menu button */}
+              <button
+                className="lg:hidden text-emerald-400 ml-auto"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="flex items-center space-x-2 flex-shrink-0">
+              <button className="flex items-center justify-center rounded-full bg-emerald-400/10 p-2 text-emerald-400 transition-all hover:bg-emerald-400/20">
+                <Shield className="h-4 w-4 xl:h-5 xl:w-5" />
+              </button>
+
+              {/* Logout Button */}
               <button
                 onClick={handleLogout}
                 className="flex items-center justify-center rounded-full bg-red-500/10 p-2 text-red-400 transition-all hover:bg-red-500/20 hover:text-red-300"
                 title="Logout"
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-4 w-4 xl:h-5 xl:w-5" />
               </button>
+
+              {/* User Profile Button */}
               <button
                 onClick={handleProfileClick}
                 className="flex items-center justify-center rounded-full bg-blue-500/10 p-2 text-blue-400 transition-all hover:bg-blue-500/20 hover:text-blue-300"
                 title="Profile"
               >
-                <User className="h-5 w-5" />
+                <User className="h-4 w-4 xl:h-5 xl:w-5" />
               </button>
             </div>
           </div>
+
           {mobileMenuOpen && (
-            <div className="md:hidden relative rounded-2xl bg-neutral-800/50 backdrop-blur-sm p-4 mb-4 border border-neutral-700/50 shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
-              <div className="relative z-10">
-                <ul className="space-y-3">
-                  <li className="group">
-                    <button
-                      onClick={() => navigate("/home")}
-                      className="block text-emerald-400 py-1 w-full text-left"
-                    >
-                      Home
-                    </button>
-                  </li>
-                  <li className="group">
-                    <button
-                      onClick={() => navigate("/community")}
-                      className="block text-neutral-400 hover:text-emerald-400 py-1 w-full text-left"
-                    >
-                      Community
-                    </button>
-                  </li>
-                  <li className="group">
-                    <button
-                      onClick={() => navigate("/token")}
-                      className="block text-neutral-400 hover:text-emerald-400 py-1 w-full text-left"
-                    >
-                      For Developers
-                    </button>
-                  </li>
-                  <li className="group">
-                    <button
-                      onClick={() => navigate("/faqs")}
-                      className="block text-neutral-400 hover:text-emerald-400 py-1 w-full text-left"
-                    >
-                      FAQs
-                    </button>
-                  </li>
-                  <li className="group pt-2 border-t border-neutral-700">
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center space-x-2 text-red-400 hover:text-red-300 py-1 w-full"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      <span>Logout</span>
-                    </button>
-                  </li>
-                </ul>
-              </div>
+            <div className="lg:hidden bg-neutral-800/90 backdrop-blur-sm rounded-lg p-4 mb-4">
+              <ul className="space-y-3">
+                <li className="group">
+                  <button
+                    onClick={() => navigate("/home")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
+                    Home
+                  </button>
+                </li>
+                <li className="group">
+                  <button
+                    onClick={() => navigate("/community")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
+                    Community
+                  </button>
+                </li>
+                <li className="group">
+                  <button
+                    onClick={() => navigate("/threat")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
+                    Report a threat
+                  </button>
+                </li>
+                <li className="group">
+                  <button
+                    onClick={() => navigate("/url")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
+                    Scan a Link
+                  </button>
+                </li>
+                <li className="group">
+                  <button
+                    onClick={() => navigate("/wifi")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
+                    Scan a WiFi Network
+                  </button>
+                </li>
+                <li className="group">
+                  <button
+                    onClick={() => navigate("/token")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
+                    For Developers
+                  </button>
+                </li>
+                <li className="group">
+                  <button
+                    onClick={() => navigate("/faqs")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
+                    FAQs
+                  </button>
+                </li>
+                <li className="group">
+                  <button
+                    onClick={() => navigate("/email")}
+                    className="block text-neutral-400 hover:text-emerald-400 py-1"
+                  >
+                    Password
+                  </button>
+                </li>
+                <li className="group pt-2 border-t border-neutral-700">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-2 text-red-400 hover:text-red-300 py-1 w-full"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
+                  </button>
+                </li>
+              </ul>
             </div>
           )}
         </div>
       </div>
-      <style jsx>{`
-        @keyframes gradient-x {
-          0%,
-          100% {
-            background-size: 200% 200%;
-            background-position: left center;
-          }
-          50% {
-            background-size: 200% 200%;
-            background-position: right center;
-          }
-        }
-        .animate-gradient-x {
-          animation: gradient-x 3s ease infinite;
-        }
-        .bg-size-200 {
-          background-size: 200% 200%;
-        }
-      `}</style>
     </div>
   );
 }

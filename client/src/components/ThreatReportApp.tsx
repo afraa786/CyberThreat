@@ -302,10 +302,12 @@ const ThreatReportApp = () => {
           <Activity className="w-4 h-4 text-emerald-400" />
         </div>
         <div className="flex items-center space-x-3">
-          <div className="flex-1 bg-gray-700 rounded-lg h-2">
-            <div
-              className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-lg transition-all duration-300"
-              style={{ width: `${threatLevel}%` }}
+          <div className="w-full bg-neutral-700 rounded-full h-3 mb-2">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${threatLevel}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="bg-emerald-500 h-3 rounded-full"
             />
           </div>
           <span className="text-emerald-400 text-sm font-medium">
@@ -328,26 +330,26 @@ const ThreatReportApp = () => {
           {steps.map((step, index) => (
             <div
               key={step.id}
-              className={`flex items-center space-x-3 p-2 rounded-lg transition-all duration-300 cursor-pointer ${
+              className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-300 cursor-pointer backdrop-blur-sm ${
                 currentStep === index
                   ? "bg-emerald-500/20 border border-emerald-500/30"
                   : currentStep > index
                   ? "bg-emerald-500/10 text-emerald-400"
-                  : "text-gray-400 hover:bg-gray-700/50"
+                  : "text-gray-400 hover:bg-gray-700/30"
               }`}
               onClick={() => setCurrentStep(index)}
             >
               <div
-                className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs ${
+                className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-medium transition-all duration-300 ${
                   currentStep === index
-                    ? "bg-emerald-500 text-white"
+                    ? "bg-emerald-500/80 text-white shadow-lg border border-emerald-400/20"
                     : currentStep > index
-                    ? "bg-emerald-500 text-white"
-                    : "bg-gray-700 text-gray-400"
+                    ? "bg-emerald-500/80 text-white shadow-lg border border-emerald-400/20"
+                    : "bg-neutral-700/80 text-gray-400 border border-neutral-600/50"
                 }`}
               >
                 {currentStep > index ? (
-                  <CheckCircle className="w-3 h-3" />
+                  <CheckCircle className="w-4 h-4" />
                 ) : (
                   index + 1
                 )}
@@ -510,7 +512,6 @@ const ThreatReportApp = () => {
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white">
-
       <Navibar />
 
       <div className="container mx-auto px-6 py-8">
