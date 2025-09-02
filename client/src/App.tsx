@@ -18,7 +18,7 @@ const CursorFollower = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const updatePosition = (e) => {
+    const updatePosition = (e: { clientX: any; clientY: any; }) => {
       setPosition({ x: e.clientX, y: e.clientY });
     };
 
@@ -209,13 +209,21 @@ function App() {
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-
                   <li className="group relative">
                     <button
                       onClick={() => navigate("/faqs")}
                       className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
                     >
                       <span>FAQs</span>
+                    </button>
+                    <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
+                  </li>
+                   <li className="group relative">
+                    <button
+                      onClick={() => navigate("/email")}
+                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                    >
+                      <span>Breach</span>
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
@@ -1006,7 +1014,7 @@ function App() {
 
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes gradient-x {
           0%,
           100% {

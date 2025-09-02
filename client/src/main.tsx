@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import WiChainDashboard from "./components/scan.tsx";
 import Profile from "./pages/Profile.tsx";
 import Community from "./components/community.tsx";
+import Email from "./components/email.tsx";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,14 @@ const router = createBrowserRouter([
      </ProtectedRoute>
   ),
 },
+  {
+    path: "/email",
+    element: (
+      <ProtectedRoute>
+        <Email />
+      </ProtectedRoute>
+    ),
+  },
  {
    path: "/community",
     element: (

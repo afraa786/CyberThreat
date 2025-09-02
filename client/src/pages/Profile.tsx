@@ -16,7 +16,6 @@ import {
   Key
 } from "lucide-react";
 
-// Define user type for TypeScript
 interface UserType {
   id: string;
   username: string;
