@@ -223,7 +223,16 @@ function App() {
                       onClick={() => navigate("/email")}
                       className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
                     >
-                      <span>Breach</span>
+                      <span>Password</span>
+                    </button>
+                    <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
+                  </li>
+                      <li className="group relative">
+                    <button
+                      onClick={() => navigate("/check")}
+                      className="flex items-center space-x-1 text-neutral-400 transition-colors hover:text-emerald-400"
+                    >
+                      <span>Email</span>
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>

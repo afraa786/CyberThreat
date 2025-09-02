@@ -70,7 +70,7 @@ const AuthPage = () => {
         role: userData.role
       };
 
-      await axios.post('http://localhost:8080/auth/signup', payload);
+      await axios.post('http://localhost:1000/auth/signup', payload);
       setActiveForm('verify');
       setSuccess('Account created! Check your email for the OTP.');
     } catch (err) {
@@ -90,7 +90,7 @@ const AuthPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/auth/login', {
+      const response = await axios.post('http://localhost:1000/auth/login', {
         email: loginData.email,
         password: loginData.password
       });
@@ -115,7 +115,7 @@ const AuthPage = () => {
     setIsLoading(true);
 
     try {
-      await axios.post('http://localhost:8080/auth/verify', {
+      await axios.post('http://localhost:1000/auth/verify', {
         email: userData.email,
         verificationCode: otp
       });
@@ -138,7 +138,7 @@ const AuthPage = () => {
     setIsLoading(true);
 
     try {
-      await axios.post('http://localhost:8080/auth/resend', null, {
+      await axios.post('http://localhost:1000/auth/resend', null, {
         params: { email: userData.email }
       });
       setSuccess('New OTP sent successfully!');
