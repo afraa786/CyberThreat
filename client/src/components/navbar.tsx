@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import {
   Terminal as TerminalIcon,
@@ -13,40 +12,42 @@ import axios from "axios";
 
 const CursorFollower = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const updatePosition = (e) => {
       setPosition({ x: e.clientX, y: e.clientY });
     };
-
     const handleMouseEnter = () => setIsVisible(true);
     const handleMouseLeave = () => setIsVisible(false);
-
-    window.addEventListener("mousemove", updatePosition);
+    document.addEventListener("mousemove", updatePosition);
     document.addEventListener("mouseenter", handleMouseEnter);
     document.addEventListener("mouseleave", handleMouseLeave);
-
+    setIsVisible(true);
     return () => {
-      window.removeEventListener("mousemove", updatePosition);
+      document.removeEventListener("mousemove", updatePosition);
       document.removeEventListener("mouseenter", handleMouseEnter);
       document.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, []);
 
-   return (
+  return (
     <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-50 mix-blend-difference"
-      animate={{
+      className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference"
+      style={{
         x: position.x - 10,
         y: position.y - 10,
         opacity: isVisible ? 1 : 0,
       }}
+      animate={{
+        x: position.x - 10,
+        y: position.y - 10,
+      }}
       transition={{
         type: "spring",
-        damping: 15,
-        stiffness: 300,
-        mass: 0.2,
+        damping: 25,
+        stiffness: 400,
+        mass: 0.1,
       }}
     >
       <div className="w-5 h-5 bg-white rounded-full shadow-lg">
@@ -56,17 +57,16 @@ const CursorFollower = () => {
   );
 };
 
-export function Navibar(){
-const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-const navigate = useNavigate();
+export function Navibar() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
-const handleLogout = async () => {
+  const handleLogout = async () => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
       navigate("/");
       return;
     }
-
     try {
       await axios.post(
         "http://localhost:8080/auth/logout",
@@ -93,17 +93,17 @@ const handleLogout = async () => {
     navigate("/profile");
   }
 
-return (
-     <div className="w-full top-0 left-0 z-40 bg-neutral-900/80 backdrop-blur-sm">
+  return (
+    <div className="w-full top-0 left-0 z-40 bg-neutral-900/80 backdrop-blur-sm">
       <CursorFollower />
       <div className="container mx-auto p-4 md:p-8">
         <div className="Navbar">
-          <div className="relative mb-6 flex items-center justify-between rounded-2xl bg-neutral-800/50 p-3 backdrop-blur-sm">
-            <div className="flex items-center space-x-8">
+          <div className="relative mb-6 flex items-center justify-between rounded-2xl bg-neutral-800/50 p-3 backdrop-blur-sm border border-neutral-700/50 shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
+            <div className="relative z-10 flex items-center space-x-8">
               <div className="flex items-center space-x-2">
                 <div className="relative"></div>
               </div>
-
               <nav className="hidden md:block">
                 <ul className="flex space-x-6">
                   <li className="group relative">
@@ -133,7 +133,6 @@ return (
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-
                   <li className="group relative">
                     <button
                       onClick={() => navigate("/url")}
@@ -143,7 +142,6 @@ return (
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-
                   <li className="group relative">
                     <button
                       onClick={() => navigate("/wifi")}
@@ -153,7 +151,6 @@ return (
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-
                   <li className="group relative">
                     <button
                       onClick={() => navigate("/token")}
@@ -163,7 +160,6 @@ return (
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
-
                   <li className="group relative">
                     <button
                       onClick={() => navigate("/faqs")}
@@ -175,7 +171,6 @@ return (
                   </li>
                 </ul>
               </nav>
-
               <button
                 className="md:hidden text-emerald-400"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -183,12 +178,10 @@ return (
                 <Menu className="h-6 w-6" />
               </button>
             </div>
-
-            <div className="flex items-center space-x-3">
+            <div className="relative z-10 flex items-center space-x-3">
               <button className="flex items-center justify-center rounded-full bg-emerald-400/10 p-2 text-emerald-400 transition-all hover:bg-emerald-400/20">
                 <Shield className="h-5 w-5" />
               </button>
-
               <motion.button
                 onClick={() => navigate("/chatbot")}
                 className="group relative overflow-hidden rounded-full px-8 py-3 transition-all duration-300 hover:scale-110 focus:scale-110 active:scale-100"
@@ -197,7 +190,6 @@ return (
               >
                 <div className="relative rounded-full bg-neutral-900 px-6 py-2 transition-all duration-300 group-hover:bg-neutral-800">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-500/10 via-transparent to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
                   <div className="relative flex items-center justify-center space-x-3">
                     <motion.svg
                       fill="none"
@@ -229,7 +221,6 @@ return (
                         d="M6.5 4L6.303 4.5915C6.24777 4.75718 6.15472 4.90774 6.03123 5.03123C5.90774 5.15472 5.75718 5.24777 5.5915 5.303L5 5.5L5.5915 5.697C5.75718 5.75223 5.90774 5.84528 6.03123 5.96877C6.15472 5.84528 6.24282 5.75223 6.4085 5.697L7 5.5L6.4085 5.303C6.24282 5.24777 6.09226 5.15472 5.96877 5.03123C5.84528 4.90774 5.75223 4.75718 5.697 4.5915L6.5 4Z"
                       />
                     </motion.svg>
-
                     <motion.span
                       className="text-base font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent group-hover:from-cyan-400 group-hover:to-emerald-400 transition-all duration-300"
                       animate={{
@@ -243,7 +234,6 @@ return (
                     >
                       AstraAI
                     </motion.span>
-
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                       {[...Array(6)].map((_, i) => (
                         <motion.div
@@ -270,8 +260,6 @@ return (
                   </div>
                 </div>
               </motion.button>
-
-              {/* Logout Button */}
               <button
                 onClick={handleLogout}
                 className="flex items-center justify-center rounded-full bg-red-500/10 p-2 text-red-400 transition-all hover:bg-red-500/20 hover:text-red-300"
@@ -279,8 +267,6 @@ return (
               >
                 <LogOut className="h-5 w-5" />
               </button>
-
-              {/* User Profile Button */}
               <button
                 onClick={handleProfileClick}
                 className="flex items-center justify-center rounded-full bg-blue-500/10 p-2 text-blue-400 transition-all hover:bg-blue-500/20 hover:text-blue-300"
@@ -290,54 +276,59 @@ return (
               </button>
             </div>
           </div>
-
           {mobileMenuOpen && (
-            <div className="md:hidden bg-neutral-800/90 backdrop-blur-sm rounded-lg p-4 mb-4">
-              <ul className="space-y-3">
-                <li className="group">
-                  <a href="#" className="block text-emerald-400 py-1">
-                    Home
-                  </a>
-                </li>
-                <li className="group">
-                  <button
-                    onClick={() => navigate("/community")}
-                    className="block text-neutral-400 hover:text-emerald-400 py-1"
-                  >
-                    Community
-                  </button>
-                </li>
-                <li className="group">
-                  <button
-                    onClick={() => navigate("/token")}
-                    className="block text-neutral-400 hover:text-emerald-400 py-1"
-                  >
-                    For Developers
-                  </button>
-                </li>
-                <li className="group">
-                  <button
-                    onClick={() => navigate("/faqs")}
-                    className="block text-neutral-400 hover:text-emerald-400 py-1"
-                  >
-                    FAQs
-                  </button>
-                </li>
-                <li className="group pt-2 border-t border-neutral-700">
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-2 text-red-400 hover:text-red-300 py-1 w-full"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>Logout</span>
-                  </button>
-                </li>
-              </ul>
+            <div className="md:hidden relative rounded-2xl bg-neutral-800/50 backdrop-blur-sm p-4 mb-4 border border-neutral-700/50 shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
+              <div className="relative z-10">
+                <ul className="space-y-3">
+                  <li className="group">
+                    <button
+                      onClick={() => navigate("/home")}
+                      className="block text-emerald-400 py-1 w-full text-left"
+                    >
+                      Home
+                    </button>
+                  </li>
+                  <li className="group">
+                    <button
+                      onClick={() => navigate("/community")}
+                      className="block text-neutral-400 hover:text-emerald-400 py-1 w-full text-left"
+                    >
+                      Community
+                    </button>
+                  </li>
+                  <li className="group">
+                    <button
+                      onClick={() => navigate("/token")}
+                      className="block text-neutral-400 hover:text-emerald-400 py-1 w-full text-left"
+                    >
+                      For Developers
+                    </button>
+                  </li>
+                  <li className="group">
+                    <button
+                      onClick={() => navigate("/faqs")}
+                      className="block text-neutral-400 hover:text-emerald-400 py-1 w-full text-left"
+                    >
+                      FAQs
+                    </button>
+                  </li>
+                  <li className="group pt-2 border-t border-neutral-700">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center space-x-2 text-red-400 hover:text-red-300 py-1 w-full"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Logout</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
           )}
         </div>
-        </div>
-        <style jsx>{`
+      </div>
+      <style jsx>{`
         @keyframes gradient-x {
           0%,
           100% {
@@ -349,15 +340,13 @@ return (
             background-position: right center;
           }
         }
-
         .animate-gradient-x {
           animation: gradient-x 3s ease infinite;
         }
-
         .bg-size-200 {
           background-size: 200% 200%;
         }
       `}</style>
-        </div>
-);
+    </div>
+  );
 }

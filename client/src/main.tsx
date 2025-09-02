@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.tsx";
-import AuthPage from "./components/AuthPage.tsx"; // Our consolidated auth component
+import AuthPage from "./components/AuthPage.tsx"; 
 import ThreatReport from "./components/ThreatReportApp.tsx";
 import Chatbot from "./components/Chatbot";
 import Url from "./components/Url.tsx";
@@ -125,7 +125,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/profile", // 
+    path: "/profile", 
     element: (
       <ProtectedRoute>
         <Profile />
