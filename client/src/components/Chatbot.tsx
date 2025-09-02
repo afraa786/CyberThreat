@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, KeyboardEvent } from 'react';
-import { Send, ArrowLeft, Bot, User, Paperclip, MoreHorizontal } from 'lucide-react';
+import { Send, ArrowLeft, Bot, User, Paperclip, MoreHorizontal, Mic, Square } from 'lucide-react';
 
 interface Message {
   role: "user" | "assistant" | "error";
@@ -12,12 +12,171 @@ export default function App() {
   const [input, setInput] = useState("");
   const [conversationId] = useState(() => Date.now().toString());
   const [loading, setLoading] = useState(false);
-
+  const [isRecording, setIsRecording] = useState(false);
+  const [microphonePermission, setMicrophonePermission] = useState<string>("unknown");
+  
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Initialize media recorder
+  useEffect(() => {
+    const initMediaRecorder = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            sampleRate: 44100,
+            channelCount: 1,
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+        
+        streamRef.current = stream;
+        setMicrophonePermission("granted");
+        
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' :
+                         MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' :
+                         MediaRecorder.isTypeSupported('audio/ogg') ? 'audio/ogg' : '';
+        
+        console.log("Using MIME type:", mimeType);
+        
+        const recorder = new MediaRecorder(stream, {
+          mimeType: mimeType || undefined
+        });
+        
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            console.log("Audio chunk received:", event.data.size, "bytes");
+            audioChunksRef.current.push(event.data);
+          }
+        };
+        
+        recorder.onstop = async () => {
+          console.log("Recording stopped, chunks:", audioChunksRef.current.length);
+          if (audioChunksRef.current.length > 0) {
+            const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+            console.log("Created blob:", audioBlob.size, "bytes, type:", audioBlob.type);
+            await sendVoiceMessage(audioBlob);
+            audioChunksRef.current = [];
+          }
+          setIsRecording(false);
+        };
+        
+        recorder.onerror = (event) => {
+          console.error("MediaRecorder error:", event);
+          setIsRecording(false);
+        };
+        
+        mediaRecorderRef.current = recorder;
+      } catch (error) {
+        console.error("Error accessing microphone:", error);
+        setMicrophonePermission("denied");
+        setMessages((prev) => [
+          ...prev,
+          { 
+            role: "error", 
+            content: "Microphone access denied. Please allow microphone permissions to use voice input.",
+            timestamp: new Date()
+          },
+        ]);
+      }
+    };
+
+    initMediaRecorder();
+    
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  const startRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'inactive') {
+      audioChunksRef.current = [];
+      console.log("Starting recording...");
+      mediaRecorderRef.current.start(100);
+      setIsRecording(true);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      console.log("Stopping recording...");
+      mediaRecorderRef.current.stop();
+    }
+  };
+
+  const sendVoiceMessage = async (audioBlob: Blob) => {
+    setLoading(true);
+    
+    try {
+      console.log("Sending voice message, blob size:", audioBlob.size);
+      
+      const formData = new FormData();
+      formData.append('conversation_id', conversationId); // conversationId must be a string
+      formData.append('audio', audioBlob, 'audio.webm');  // audioBlob is a Blob/File
+
+      console.log("Sending request to backend...");
+      const response = await fetch(`http://localhost:1000/voice_chat/`, {
+        method: "POST",
+        body: formData
+      });
+      
+      console.log("Response status:", response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Server error response:", errorText);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log("Response data:", data);
+
+      const userMessage: Message = { 
+        role: "user", 
+        content: data.transcribed_text || "Voice message",
+        timestamp: new Date()
+      };
+      setMessages((prev) => [...prev, userMessage]);
+      
+      const botMessage: Message = { 
+        role: "assistant", 
+        content: data.response_text || "I received your voice message",
+        timestamp: new Date()
+      };
+      setMessages((prev) => [...prev, botMessage]);
+      
+      if (data.audio_url) {
+        try {
+          const audio = new Audio(`http://localhost:1000${data.audio_url}`);
+          audio.play().catch(err => console.error("Error playing audio:", err));
+        } catch (audioError) {
+          console.error("Error creating audio:", audioError);
+        }
+      }
+    } catch (err) {
+      console.error("Error sending voice message:", err);
+      setMessages((prev) => [
+        ...prev,
+        { 
+          role: "error", 
+          content: `Failed to process voice message: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          timestamp: new Date()
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -41,32 +200,28 @@ export default function App() {
           conversation_id: conversationId,
         }),
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Server error:", errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
 
-      if (response.ok) {
-        const botMessage: Message = { 
-          role: "assistant", 
-          content: data.response,
-          timestamp: new Date()
-        };
-        setMessages((prev) => [...prev, botMessage]);
-      } else {
-        const errorMsg = data.detail || "Connection failed. Please try again.";
-        setMessages((prev) => [
-          ...prev,
-          { 
-            role: "error", 
-            content: errorMsg,
-            timestamp: new Date()
-          },
-        ]);
-      }
+      const botMessage: Message = { 
+        role: "assistant", 
+        content: data.response || "I received your message",
+        timestamp: new Date()
+      };
+      setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
+      console.error("Error sending message:", err);
       setMessages((prev) => [
         ...prev,
         { 
           role: "error", 
-          content: "Network error. Please try again.",
+          content: `Network error: ${err instanceof Error ? err.message : 'Unknown error'}`,
           timestamp: new Date()
         },
       ]);
@@ -110,10 +265,8 @@ export default function App() {
 
       {/* Main Chat Area */}
       <main className="flex-1 overflow-hidden flex flex-col">
-        {/* Welcome Screen or Messages */}
         <div className="flex-1 overflow-y-auto">
           {messages.length === 0 ? (
-            /* Welcome Screen */
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/20">
                 <Bot className="h-8 w-8 text-neutral-900" />
@@ -123,7 +276,14 @@ export default function App() {
                 Your intelligent guardian in the digital realm. I'm here to help you detect, analyze, and respond to cyber threats with real-time insights and smart defense.
               </p>
               
-              {/* Example prompts */}
+              {microphonePermission === "denied" && (
+                <div className="mb-6 p-4 bg-red-900/30 border border-red-600/50 rounded-xl max-w-md">
+                  <p className="text-red-300 text-sm">
+                    Microphone access is required for voice features. Please enable microphone permissions in your browser settings.
+                  </p>
+                </div>
+              )}
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl w-full">
                 <button
                   onClick={() => setInput("Analyze this suspicious email for phishing attempts")}
@@ -159,7 +319,6 @@ export default function App() {
               </div>
             </div>
           ) : (
-            /* Messages */
             <div className="px-4 py-6 max-w-4xl mx-auto w-full space-y-6">
               {messages.map((msg, idx) => (
                 <div key={idx} className="flex gap-4 animate-fade-in">
@@ -214,7 +373,7 @@ export default function App() {
                         <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                         <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       </div>
-                      <span className="text-sm">Thinking...</span>
+                      <span className="text-sm">Processing voice...</span>
                     </div>
                   </div>
                 </div>
@@ -240,7 +399,7 @@ export default function App() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  disabled={loading}
+                  disabled={loading || isRecording}
                   style={{ height: 'auto' }}
                   onInput={(e) => {
                     const target = e.target as HTMLTextAreaElement;
@@ -250,9 +409,29 @@ export default function App() {
                 />
               </div>
               
+              {isRecording ? (
+                <div className="relative">
+                  <div className="absolute -inset-2 bg-red-500/20 rounded-full animate-pulse"></div>
+                  <button
+                    onClick={stopRecording}
+                    className="relative p-2 bg-red-600 hover:bg-red-500 rounded-xl transition-colors mb-2 flex items-center justify-center min-w-[40px] h-10 shadow-sm z-10"
+                  >
+                    <Square className="h-4 w-4 text-white" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={startRecording}
+                  disabled={loading || microphonePermission === "denied"}
+                  className="p-2 text-emerald-400 hover:text-emerald-300 hover:bg-neutral-700/50 disabled:hover:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors mb-2 flex items-center justify-center min-w-[40px] h-10"
+                >
+                  <Mic className="h-5 w-5" />
+                </button>
+              )}
+              
               <button
                 onClick={sendMessage}
-                disabled={loading || !input.trim()}
+                disabled={loading || !input.trim() || isRecording}
                 className="p-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-neutral-700 disabled:cursor-not-allowed rounded-xl transition-colors mb-2 flex items-center justify-center min-w-[40px] h-10 shadow-sm"
               >
                 {loading ? (
@@ -264,7 +443,16 @@ export default function App() {
             </div>
             
             <div className="mt-2 text-xs text-emerald-400/70 text-center">
-              AstraAI can make mistakes. Verify important security information.
+              {isRecording ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></div>
+                  Recording... Click to stop
+                </div>
+              ) : microphonePermission === "denied" ? (
+                "Microphone access denied. Please enable microphone permissions to use voice features."
+              ) : (
+                "AstraAI can make mistakes. Verify important security information."
+              )}
             </div>
           </div>
         </div>
