@@ -36,4 +36,5 @@ build/
 node_modules/
 application.properties
 .venv
+venv/
 .env

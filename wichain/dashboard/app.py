@@ -224,7 +224,7 @@ elif page == "Blockchain Explorer":
                     st.write("**Block Data:**")
                     st.json(block['data'])
         
-        # Blockchain statistics
+  
         st.subheader("Blockchain Statistics")
         col1, col2, col3 = st.columns(3)
         
@@ -311,7 +311,7 @@ elif page == "System Statistics":
 
 # Real-time Monitoring Page
 elif page == "Real-time Monitoring":
-    st.header("📡 Real-time Monitoring")
+    st.header(" Real-time Monitoring")
     
     st.info("This page shows real-time network monitoring data")
     

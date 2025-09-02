@@ -17,11 +17,19 @@ import Profile from "./pages/Profile.tsx";
 import Community from "./components/community.tsx";
 import Email from "./components/email.tsx";
 import Check from "./components/check.tsx";
-
+import Map from "./components/map.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
     element: <AuthPage />,
+  },
+  {
+    path: "/map",
+    element: (
+      <ProtectedRoute>
+        <Map />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/check",
