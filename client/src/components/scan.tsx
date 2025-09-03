@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Navibar } from "./navbar";
+import { Navibar } from "./Navbar";
 import {
   Card,
   CardContent,
@@ -51,36 +51,32 @@ import {
   Settings,
   Filter,
   Play,
-  Pause
+  Pause,
+  Info
 } from 'lucide-react';
 
 // API base URL
 const API_BASE = 'http://localhost:8000';
 
-// Types based on your API responses
+// Types based on WiChain API responses
 interface NetworkDevice {
   ssid: string;
   bssid: string;
   is_spoof: boolean;
-  vendor: string;
   ml_confidence: number;
   ml_prediction: number;
-  timestamp: string;
+  rule_based_reasons: string[];
+  vendor?: string;
   features: {
     signal_strength: number;
-    channel: number;
     frequency: number;
-    ssid_length: number;
-    has_common_rogue_pattern: number;
-    is_hidden: number;
-    vendor_risk: number;
-    is_locally_administered: number;
-    encryption_risk: number;
-    signal_category: number;
-    channel_width: number;
-    is_DFS_channel: number;
+    channel: number;
+    encryption: string;
+    latitude: number;
+    longitude: number;
+    vendor: string;
   };
-  reasons: string[];
+  timestamp: string;
 }
 
 interface ScanConfig {
@@ -92,128 +88,98 @@ interface ScanConfig {
 
 const COLORS = ['#10b981', '#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444'];
 
-// Mock data generator
+// Mock data generator that matches WiChain API format
 const generateMockNetworks = (): NetworkDevice[] => {
   const networks = [
     {
       ssid: "HomeNetwork_5G",
       bssid: "aa:bb:cc:dd:ee:01",
       is_spoof: false,
-      vendor: "NETGEAR",
       ml_confidence: 0.95,
       ml_prediction: 0,
+      rule_based_reasons: [],
       timestamp: new Date().toISOString(),
       features: {
         signal_strength: -45,
+        frequency: 5.0,
         channel: 36,
-        frequency: 5180,
-        ssid_length: 13,
-        has_common_rogue_pattern: 0,
-        is_hidden: 0,
-        vendor_risk: 0,
-        is_locally_administered: 0,
-        encryption_risk: 0,
-        signal_category: 4,
-        channel_width: 80,
-        is_DFS_channel: 0
-      },
-      reasons: ["Strong signal", "Trusted vendor"]
+        encryption: "WPA2",
+        latitude: 19.08,
+        longitude: 72.88,
+        vendor: "NETGEAR"
+      }
     },
     {
       ssid: "Starbucks_WiFi",
       bssid: "bb:cc:dd:ee:ff:02",
       is_spoof: true,
-      vendor: "Unknown",
       ml_confidence: 0.88,
       ml_prediction: 1,
+      rule_based_reasons: ["vendor mismatch", "suspicious signal pattern"],
       timestamp: new Date().toISOString(),
       features: {
         signal_strength: -65,
+        frequency: 2.4,
         channel: 6,
-        frequency: 2437,
-        ssid_length: 13,
-        has_common_rogue_pattern: 1,
-        is_hidden: 0,
-        vendor_risk: 1,
-        is_locally_administered: 1,
-        encryption_risk: 1,
-        signal_category: 2,
-        channel_width: 20,
-        is_DFS_channel: 0
-      },
-      reasons: ["Suspicious patterns detected", "Open network"]
+        encryption: "OPEN",
+        latitude: 19.08,
+        longitude: 72.88,
+        vendor: "Unknown"
+      }
     },
     {
       ssid: "FreeWiFi_Connect",
       bssid: "cc:dd:ee:ff:00:03",
       is_spoof: true,
-      vendor: "Generic",
       ml_confidence: 0.92,
       ml_prediction: 1,
+      rule_based_reasons: ["common rogue pattern", "open encryption"],
       timestamp: new Date().toISOString(),
       features: {
         signal_strength: -55,
+        frequency: 2.4,
         channel: 11,
-        frequency: 2462,
-        ssid_length: 15,
-        has_common_rogue_pattern: 1,
-        is_hidden: 0,
-        vendor_risk: 1,
-        is_locally_administered: 1,
-        encryption_risk: 1,
-        signal_category: 3,
-        channel_width: 20,
-        is_DFS_channel: 0
-      },
-      reasons: ["Generic vendor", "Suspicious name pattern"]
+        encryption: "OPEN",
+        latitude: 19.08,
+        longitude: 72.88,
+        vendor: "Generic"
+      }
     },
     {
       ssid: "OfficeNetwork_Secure",
       bssid: "dd:ee:ff:00:11:04",
       is_spoof: false,
-      vendor: "Cisco",
       ml_confidence: 0.98,
       ml_prediction: 0,
+      rule_based_reasons: [],
       timestamp: new Date().toISOString(),
       features: {
         signal_strength: -50,
+        frequency: 5.0,
         channel: 1,
-        frequency: 2412,
-        ssid_length: 18,
-        has_common_rogue_pattern: 0,
-        is_hidden: 0,
-        vendor_risk: 0,
-        is_locally_administered: 0,
-        encryption_risk: 0,
-        signal_category: 4,
-        channel_width: 40,
-        is_DFS_channel: 0
-      },
-      reasons: ["Trusted enterprise vendor", "Strong encryption"]
+        encryption: "WPA3",
+        latitude: 19.08,
+        longitude: 72.88,
+        vendor: "Cisco"
+      }
     },
     {
       ssid: "AndroidAP_1234",
       bssid: "ee:ff:00:11:22:05",
       is_spoof: false,
-      vendor: "Samsung",
       ml_confidence: 0.85,
       ml_prediction: 0,
+      rule_based_reasons: [],
       timestamp: new Date().toISOString(),
       features: {
         signal_strength: -70,
+        frequency: 2.4,
         channel: 6,
-        frequency: 2437,
-        ssid_length: 12,
-        has_common_rogue_pattern: 0,
-        is_hidden: 0,
-        vendor_risk: 0,
-        is_locally_administered: 0,
-        encryption_risk: 0,
-        signal_category: 2,
-        channel_width: 20,
-        is_DFS_channel: 0
-      },
-      reasons: ["Mobile hotspot", "Legitimate device"]
+        encryption: "WPA2",
+        latitude: 19.08,
+        longitude: 72.88,
+        vendor: "Samsung"
+      }
     }
   ];
   return networks;
@@ -231,6 +197,17 @@ const WiFiScanner: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [manualNetwork, setManualNetwork] = useState({
+    ssid: "Free Public WiFi",
+    bssid: "12:34:56:78:90:AB",
+    signal_strength: -75,
+    frequency: 2.4,
+    channel: 6,
+    encryption: "OPEN",
+    latitude: 19.08,
+    longitude: 72.88,
+    vendor: "TP-Link"
+  });
 
   const getSignalStrength = (strength: number) => {
     if (strength >= -50) return { level: 'Excellent', percentage: 100, color: 'text-emerald-400', bars: 4 };
@@ -240,8 +217,8 @@ const WiFiScanner: React.FC = () => {
     return { level: 'Very Weak', percentage: 20, color: 'text-red-400', bars: 1 };
   };
 
-  const getSecurityLevel = (encryptionRisk: number) => {
-    return encryptionRisk === 1 
+  const getSecurityLevel = (encryption: string) => {
+    return encryption === 'OPEN' || encryption === 'WEP' 
       ? { status: 'No Password', icon: Unlock, color: 'text-red-400', variant: 'destructive' as const, description: 'Anyone can connect without a password' }
       : { status: 'Password Protected', icon: Lock, color: 'text-emerald-400', variant: 'default' as const, description: 'Requires password to connect' };
   };
@@ -277,7 +254,7 @@ const WiFiScanner: React.FC = () => {
   const fetchNetworks = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE}/api/networks?limit=20`);
+      const response = await fetch(`${API_BASE}/api/scan_real/`);
       if (!response.ok) {
         if (response.status === 404) {
           setNetworks(generateMockNetworks());
@@ -305,6 +282,9 @@ const WiFiScanner: React.FC = () => {
       setIsScanning(true);
       const response = await fetch(`${API_BASE}/api/scan`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       if (!response.ok) {
         if (response.status === 404) {
@@ -318,7 +298,8 @@ const WiFiScanner: React.FC = () => {
         setNetworks(generateMockNetworks());
         return;
       }
-      await fetchNetworks();
+      const data = await response.json();
+      setNetworks(data);
     } catch (err) {
       setNetworks(generateMockNetworks());
       setError('Using demo data - scanner not connected');
@@ -339,10 +320,10 @@ const WiFiScanner: React.FC = () => {
             signal_strength: network.features.signal_strength,
             frequency: network.features.frequency,
             channel: network.features.channel,
-            encryption: network.features.encryption_risk === 1 ? 'Open' : 'Secure',
-            latitude: 0,
-            longitude: 0,
-            vendor: network.vendor
+            encryption: network.features.encryption,
+            latitude: network.features.latitude,
+            longitude: network.features.longitude,
+            vendor: network.features.vendor
           }),
         });
         
@@ -363,6 +344,27 @@ const WiFiScanner: React.FC = () => {
     }
   };
 
+  const detectManualNetwork = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE}/api/detect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(manualNetwork),
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        // Add the result to the networks list
+        setNetworks(prev => [result, ...prev]);
+      }
+    } catch (err) {
+      setError('Failed to detect manual network');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchNetworks();
   }, [fetchNetworks]);
@@ -371,17 +373,17 @@ const WiFiScanner: React.FC = () => {
     if (selectedFilter === 'all') return true;
     if (selectedFilter === 'safe') return !network.is_spoof;
     if (selectedFilter === 'suspicious') return network.is_spoof;
-    if (selectedFilter === 'open') return network.features?.encryption_risk === 1;
-    if (selectedFilter === 'secure') return network.features?.encryption_risk === 0;
+    if (selectedFilter === 'open') return network.features.encryption === 'OPEN';
+    if (selectedFilter === 'secure') return network.features.encryption !== 'OPEN';
     return true;
   });
 
   const safeNetworks = networks.filter(n => !n.is_spoof).length;
   const suspiciousNetworks = networks.filter(n => n.is_spoof).length;
-  const openNetworks = networks.filter(n => n.features?.encryption_risk === 1).length;
+  const openNetworks = networks.filter(n => n.features.encryption === 'OPEN').length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-950">
       <div className="container mx-auto p-4 md:p-8">
          <Navibar />
         {/* Header */}
@@ -550,6 +552,118 @@ const WiFiScanner: React.FC = () => {
           </motion.div>
         </div>
 
+        {/* Manual Network Detection */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="relative rounded-2xl bg-neutral-900/80 p-8 backdrop-blur-sm border border-neutral-700/50 shadow-2xl mb-8"
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
+
+          <div className="relative z-10">
+            <h2 className="text-xl font-semibold text-neutral-100 mb-6 flex items-center space-x-2">
+              <Wifi className="h-5 w-5 text-emerald-400" />
+              <span>Manual Network Detection</span>
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-neutral-300 mb-2 block">SSID</Label>
+                    <Input 
+                      value={manualNetwork.ssid}
+                      onChange={(e) => setManualNetwork({...manualNetwork, ssid: e.target.value})}
+                      className="bg-neutral-900/50 border-emerald-400/30 text-white rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-neutral-300 mb-2 block">BSSID</Label>
+                    <Input 
+                      value={manualNetwork.bssid}
+                      onChange={(e) => setManualNetwork({...manualNetwork, bssid: e.target.value})}
+                      className="bg-neutral-900/50 border-emerald-400/30 text-white rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-neutral-300 mb-2 block">Signal Strength</Label>
+                    <Input 
+                      type="number"
+                      value={manualNetwork.signal_strength}
+                      onChange={(e) => setManualNetwork({...manualNetwork, signal_strength: parseInt(e.target.value)})}
+                      className="bg-neutral-900/50 border-emerald-400/30 text-white rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-neutral-300 mb-2 block">Vendor</Label>
+                    <Input 
+                      value={manualNetwork.vendor}
+                      onChange={(e) => setManualNetwork({...manualNetwork, vendor: e.target.value})}
+                      className="bg-neutral-900/50 border-emerald-400/30 text-white rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-neutral-300 mb-2 block">Encryption</Label>
+                    <Select 
+                      value={manualNetwork.encryption}
+                      onValueChange={(value) => setManualNetwork({...manualNetwork, encryption: value})}
+                    >
+                      <SelectTrigger className="w-full bg-neutral-900/50 border-emerald-400/30 text-white rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-neutral-900 border-emerald-400/30 rounded-xl">
+                        <SelectItem value="OPEN">Open</SelectItem>
+                        <SelectItem value="WEP">WEP</SelectItem>
+                        <SelectItem value="WPA">WPA</SelectItem>
+                        <SelectItem value="WPA2">WPA2</SelectItem>
+                        <SelectItem value="WPA3">WPA3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-neutral-300 mb-2 block">Channel</Label>
+                    <Input 
+                      type="number"
+                      value={manualNetwork.channel}
+                      onChange={(e) => setManualNetwork({...manualNetwork, channel: parseInt(e.target.value)})}
+                      className="bg-neutral-900/50 border-emerald-400/30 text-white rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={detectManualNetwork}
+                  disabled={loading}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Check Network Safety
+                </Button>
+              </div>
+
+              <div className="p-6 bg-neutral-900/30 rounded-xl border border-neutral-600">
+                <h3 className="text-lg font-semibold text-neutral-100 mb-4">About Manual Detection</h3>
+                <p className="text-neutral-400 text-sm">
+                  Manually check a specific network for spoofing by providing its details. This is useful for networks that might not appear in automatic scans or for testing specific access points.
+                </p>
+                <div className="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
+                  <p className="text-emerald-400 text-sm font-medium flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    Tip: Use this to verify suspicious networks before connecting
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Security Overview */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -675,8 +789,8 @@ const WiFiScanner: React.FC = () => {
                 <div className="space-y-4">
                   {filteredNetworks.map((network, index) => {
                     const threat = getThreatLevel(network.is_spoof, network.ml_confidence);
-                    const security = getSecurityLevel(network.features?.encryption_risk || 0);
-                    const signal = getSignalStrength(network.features?.signal_strength || -100);
+                    const security = getSecurityLevel(network.features.encryption);
+                    const signal = getSignalStrength(network.features.signal_strength);
                     const NetworkIcon = getNetworkTypeIcon(network.ssid);
                     
                     return (
@@ -696,7 +810,10 @@ const WiFiScanner: React.FC = () => {
                               <h3 className="text-lg font-semibold text-neutral-100">
                                 {network.ssid || 'Hidden Network'}
                               </h3>
-                              <p className="text-neutral-400 text-sm">{network.vendor}</p>
+                              <p className="text-neutral-400 text-sm">
+                                {/* Prefer top-level vendor, fallback to features.vendor */}
+                                {network.vendor || network.features.vendor || "Unknown"}
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
@@ -768,7 +885,7 @@ const WiFiScanner: React.FC = () => {
                         <div className="grid grid-cols-2 gap-4 text-xs text-neutral-500">
                           <div className="flex items-center gap-1">
                             <Signal className="w-3 h-3" />
-                            <span>Channel {network.features?.channel || 'Unknown'}</span>
+                            <span>Channel {network.features.channel || 'Unknown'}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />
@@ -776,7 +893,7 @@ const WiFiScanner: React.FC = () => {
                           </div>
                         </div>
 
-                        {network.is_spoof && (
+                        {network.is_spoof && network.rule_based_reasons.length > 0 && (
                           <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
@@ -787,7 +904,7 @@ const WiFiScanner: React.FC = () => {
                               Warning: Dangerous Network Detected
                             </p>
                             <p className="text-neutral-400 text-xs mt-2">
-                              This network appears to be malicious and could steal your passwords, personal information, or monitor your online activity. We strongly recommend avoiding this connection.
+                              Reasons: {network.rule_based_reasons.join(', ')}
                             </p>
                           </motion.div>
                         )}

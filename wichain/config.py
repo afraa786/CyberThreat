@@ -31,4 +31,4 @@ MODEL_PARAMS = {
 }
 
 # Feature settings
-SIGNAL_BINS = [-100, -85, -70, -55, -40]  # dBm ranges
+SIGNAL_BINS = [-85, -70, -55, -40]  # dBm ranges

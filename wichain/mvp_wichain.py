@@ -221,9 +221,9 @@ class WiChainDetector:
             network = WiFiNetwork(
                 ssid=network_data.get('ssid', ''),
                 bssid=network_data.get('bssid', ''),
-                signal_strength=network_data.get('signal_strength', -100),
-                frequency=network_data.get('frequency', 2.4),
-                channel=network_data.get('channel', 1),
+                signal_strength=network_data.get('signal_strength'),
+                frequency=network_data.get('frequency'),
+                channel=network_data.get('channel'),
                 encryption=network_data.get('encryption', 'UNKNOWN'),
                 latitude=network_data.get('latitude', 0.0),
                 longitude=network_data.get('longitude', 0.0),

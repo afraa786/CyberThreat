@@ -117,7 +117,7 @@ def scan_wifi_networks():
                             "ssid": current_ssid,
                             "bssid": bssid,
                             "vendor": get_vendor_from_bssid(bssid),
-                            "signal_strength": -100,  # default
+                            "signal_strength": -70,  # default
                             "encryption": "Unknown",
                             "timestamp": datetime.now().isoformat()
                         }
@@ -135,7 +135,7 @@ def scan_wifi_networks():
                             network_info = {
                                 "ssid": ssid,
                                 "bssid": "",
-                                "signal_strength": -100,
+                                "signal_strength": -70,
                                 "encryption": "Unknown",
                                 "timestamp": datetime.now().isoformat(),
                                 "vendor": "Unknown"
@@ -160,12 +160,12 @@ def analyze_network_security(network):
         "ml_confidence": 0.0,
         "ml_prediction": 0,
         "features": {
-            "signal_strength": network.get("signal_strength", -100),
+            "signal_strength": network.get("signal_strength"),
             "ssid_length": len(network.get("ssid", "")),
             "has_common_rogue_pattern": 0,
             "is_hidden": 0,
             "vendor_name": vendor,
-            "vendor_risk": 2 if vendor == "Unknown" else 0,
+            "vendor_risk": 1 if vendor == "Unknown" else 0,
             "is_locally_administered": 0,
             "encryption_risk": 1 if network.get("encryption") == "Open" else 0,
         }
