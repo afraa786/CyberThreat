@@ -50,7 +50,7 @@ export function Navibar() {
     <div className="w-full top-0 left-0 z-40 bg-neutral-900/80 backdrop-blur-sm">
       <div className="container mx-auto p-4 md:p-8">
         <div className="Navbar">
-          <div className="relative mb-6 flex items-center justify-between rounded-2xl bg-neutral-800/50 p-3 backdrop-blur-sm">
+          <div className="relative mb-2 flex items-center justify-between rounded-2xl bg-neutral-800/50 p-3 backdrop-blur-sm">
             <div className="flex items-center min-w-0 flex-1">
               <div className="flex items-center space-x-2 flex-shrink-0">
                 <div className="relative"></div>
@@ -308,9 +308,9 @@ export function Navibar() {
             </div>
 
             <div className="flex items-center space-x-2 flex-shrink-0">
-              <button className="flex items-center justify-center rounded-full bg-emerald-400/10 p-2 text-emerald-400 transition-all hover:bg-emerald-400/20">
+              {/* <button className="flex items-center justify-center rounded-full bg-emerald-400/10 p-2 text-emerald-400 transition-all hover:bg-emerald-400/20">
                 <Shield className="h-4 w-4 xl:h-5 xl:w-5" />
-              </button>
+              </button> */}
 
               {/* Logout Button */}
               <button

@@ -29,6 +29,13 @@
   --ring: 0 0% 83.1%;
 }
 
+/* * {
+  cursor: url("c2.png"), pointer;
+} */
+a, button, [role="button"], input[type="submit"], input[type="button"] {
+  cursor: url("c2.png"), pointer;
+}
+
 body {
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
@@ -38,6 +45,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: theme('colors.neutral.900');
   color: theme('colors.neutral.100');
+  cursor: url('c1.png'), auto;
 }
 
 /* h1{

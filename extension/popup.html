@@ -2,21 +2,396 @@
 <html>
   <head>
     <title>Phishing Detector</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="popup.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 360px;
+        min-height: 480px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+        color: #ffffff;
+        overflow: hidden;
+      }
+
+      /* Header with logo and brand */
+      .header {
+        background: rgba(16, 185, 129, 0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .brand-name {
+        font-size: 20px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #10b981, #34d399);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Main content */
+      main {
+        padding: 24px 20px;
+      }
+
+      /* URL Input Card */
+      .input-card {
+        background: rgba(63, 63, 70, 0.3);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(63, 63, 70, 0.5);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+      }
+
+      .input-card:hover {
+        border-color: rgba(16, 185, 129, 0.3);
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
+      }
+
+      .input-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #a1a1aa;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      #url-input {
+        width: 100%;
+        background: rgba(24, 24, 27, 0.8);
+        border: 2px solid rgba(63, 63, 70, 0.6);
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 14px;
+        color: #ffffff;
+        transition: all 0.3s ease;
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      }
+
+      #url-input:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        background: rgba(24, 24, 27, 0.95);
+      }
+
+      #url-input::placeholder {
+        color: #71717a;
+      }
+
+      /* Check URL Button */
+      .check-button {
+        width: 100%;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border: none;
+        border-radius: 12px;
+        padding: 14px 24px;
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+
+      .check-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        background: linear-gradient(135deg, #059669, #047857);
+      }
+
+      .check-button:active {
+        transform: translateY(0);
+      }
+
+      .check-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+
+      /* Status and Results */
+      .status-card, .result-card {
+        background: rgba(63, 63, 70, 0.3);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(63, 63, 70, 0.5);
+        border-radius: 16px;
+        padding: 18px 20px;
+        margin-bottom: 16px;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .check {
+        font-size: 14px;
+        color: #fbbf24;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .check::before {
+        content: '';
+        width: 16px;
+        height: 16px;
+        border: 2px solid #fbbf24;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .result {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+
+      /* Safe result styling */
+      .result.safe {
+        color: #10b981;
+        border-color: rgba(16, 185, 129, 0.3);
+        background: rgba(16, 185, 129, 0.1);
+      }
+
+      .result.safe::before {
+        content: '✓';
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        background: #10b981;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 24px;
+        margin-right: 8px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      /* Phishing result styling */
+      .result.phishing {
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.3);
+        background: rgba(239, 68, 68, 0.1);
+      }
+
+      .result.phishing::before {
+        content: '⚠';
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        background: #ef4444;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 24px;
+        margin-right: 8px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      /* Error styling */
+      .result.error {
+        color: #f87171;
+        border-color: rgba(248, 113, 113, 0.3);
+        background: rgba(248, 113, 113, 0.1);
+      }
+
+      .result.error::before {
+        content: '✕';
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        background: #f87171;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 24px;
+        margin-right: 8px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      /* Hide form since we'll use button instead */
+      #url-form {
+        display: none;
+      }
+
+      /* Subtle animations */
+      .input-card, .status-card, .result-card {
+        animation: slideUp 0.5s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 400px) {
+        body {
+          width: 320px;
+        }
+        
+        main {
+          padding: 20px 16px;
+        }
+        
+        .header {
+          padding: 14px 16px;
+        }
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Auto-check current tab
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+          var url = tabs[0].url;
+          document.getElementById("url-input").value = url;
+          checkPhishing(url, "check");
+        });
+
+        // Manual button click
+        document
+          .getElementById("check-button")
+          .addEventListener("click", function (event) {
+            event.preventDefault();
+            var url = document.getElementById("url-input").value;
+            if (url.trim()) {
+              checkPhishing(url, "result");
+            }
+          });
+
+        // Manual form submission (fallback)
+        document
+          .getElementById("url-form")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+            var url = document.getElementById("url-input1").value;
+            checkPhishing(url, "result");
+          });
+      });
+
+      function checkPhishing(url, classname) {
+        var resultDiv = document.getElementsByClassName(classname)[0];
+        var checkButton = document.getElementById("check-button");
+        
+        // Disable button during check
+        if (checkButton && classname === "result") {
+          checkButton.disabled = true;
+          checkButton.textContent = "Checking...";
+        }
+
+        fetch("http://127.0.0.1:5000/predict", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ url: url }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("ML API Response:", data);
+
+            // Reset button
+            if (checkButton && classname === "result") {
+              checkButton.disabled = false;
+              checkButton.textContent = "Check URL";
+            }
+
+            if (data.error) {
+              resultDiv.innerHTML = "Error: " + data.error;
+              resultDiv.className = classname + " error";
+            } else if (data.prediction) {
+              if (data.prediction === "phishing") {
+                resultDiv.innerHTML = `Phishing detected!<br><small>Safe Probability: ${(
+                  data.probabilities.safe * 100
+                ).toFixed(2)}%</small>`;
+                resultDiv.className = classname + " phishing";
+              } else {
+                resultDiv.innerHTML = `Safe!<br><small>Safe Probability: ${(
+                  data.probabilities.safe * 100
+                ).toFixed(2)}%</small>`;
+                resultDiv.className = classname + " safe";
+              }
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            
+            // Reset button
+            if (checkButton && classname === "result") {
+              checkButton.disabled = false;
+              checkButton.textContent = "Check URL";
+            }
+
+            resultDiv.innerHTML = "Could not connect to ML API";
+            resultDiv.className = classname + " error";
+          });
+      }
+    </script>
   </head>
   <body>
-    <header>
-      <h1>Phishing Detector</h1>
+    <header class="header">
+      <div class="logo">S</div>
+      <div class="brand-name">Securo</div>
     </header>
+    
     <main>
-      <div>
-        <input type="text" id="url-input" />
+      <button id="check-button" class="check-button">Scan URL</button>
+      
+      <div class="status-card">
         <p class="check">Checking...</p>
       </div>
+
       <form id="url-form">
       </form>
-      <div class="result"></div>
+      
+      <div class="result-card">
+        <div class="result"></div>
+      </div>
     </main>
   </body>
 </html> 

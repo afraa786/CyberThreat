@@ -4,6 +4,15 @@ import {
   ShieldCheck,
   Shield,
   User,
+  Smartphone,
+  Activity,
+  Chrome,
+  Globe,
+  Users,
+  Key,
+  MapPin,
+  Wifi,
+  Download,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -16,7 +25,7 @@ const CursorFollower = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const updatePosition = (e: { clientX: any; clientY: any; }) => {
+    const updatePosition = (e: { clientX: any; clientY: any }) => {
       setPosition({ x: e.clientX, y: e.clientY });
     };
 
@@ -79,7 +88,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800">
-      <CursorFollower />
+   
       <div className="container mx-auto p-4 md:p-8">
         {/* Header */}
         <div className="mb-4 md:mb-8 flex flex-col md:flex-row md:items-center justify-between">
@@ -109,29 +118,38 @@ function App() {
         {/* Use Navbar component */}
         <Navibar />
 
-        <header className="px-6 py-20 text-center">
-          <h2 className="text-4xl md:text-6xl font-extrabold mb-6 text-white tracking-tight">
+        <header className="px-6 pt-10 pb-20 text-center">
+          <h2 className="text-5xl md:text-6xl font-extrabold mb-6 text-white tracking-tight">
             scams are dumb, <br />
             stay safe with <span className="typewriter">Securo</span>.
           </h2>
+
           <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto">
             securo helps protect <span className="text-emerald-400">kids</span>,
             <span className="text-emerald-400"> elders</span>, and
             <span className="text-emerald-400"> non-tech folks</span> from
             online frauds & digital scams.
           </p>
-          <button
-            onClick={() => navigate("/url")}
-            className="mt-8 px-6 py-3 rounded-2xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition shadow-lg"
-          >
-            scan a link!
-          </button>
-          <button
-            onClick={() => navigate("/docs")}
-            className="mt-8 ml-2 px-6 py-3 rounded-2xl bg-gray-300 text-black font-semibold hover:bg-gray-100 transform transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
-            read documentation
-          </button>
+
+          {/* Buttons row */}
+          <div className="flex justify-center gap-4 mt-8 flex-wrap">
+            <button
+              onClick={() => navigate("/url")}
+              className="px-6 py-3 rounded-2xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition shadow-lg"
+            >
+              scan a link!
+            </button>
+
+            <button
+              onClick={() => navigate("/docs")}
+              className="px-6 py-3 rounded-2xl bg-gray-300 text-black font-semibold hover:bg-gray-100 transform transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
+            >
+              <Download className="w-5 h-5" />
+              add web extension
+            </button>
+          </div>
+
+          {/* Testimonials slider */}
           <div className="mt-12 overflow-hidden">
             <motion.div
               className="flex gap-6"
@@ -155,15 +173,16 @@ function App() {
               ))}
             </motion.div>
           </div>
+
           <div className="mt-5 text-center">
             <p className="mt-2 text-zinc-400 max-w-xl mx-auto text-sm">
               Trusted by millions of people worldwide.
             </p>
           </div>
 
-        <FeaturesSection />
+          <FeaturesSection />
 
-        <div className="mt-32 relative">
+          <div className="mt-32 relative">
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-cyan-500/5 blur-3xl"></div>
             <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
             <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
@@ -503,6 +522,160 @@ function App() {
           <div className="inline-flex items-center px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full mb-6">
             <ShieldCheck className="w-4 h-4 text-emerald-400 mr-2" />
             <span className="text-sm text-emerald-400 font-medium">
+              Mobile App
+            </span>
+          </div>
+
+          <h3 className="text-4xl md:text-5xl font-bold text-white mb-3">
+            Try our Mobile App today!
+          </h3>
+
+          <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+            With new features, and easy smartphone access for you!
+          </p>
+        </div>
+
+        {/* Android App Section */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-900/20 via-neutral-900/60 to-emerald-800/20 border border-emerald-500/20 backdrop-blur-xl shadow-2xl mb-16">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-emerald-500/5 opacity-50"></div>
+          <div className="absolute top-10 left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
+          <div className="relative z-10 px-8 py-16 lg:px-16 lg:py-20">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Text Content */}
+              <div className="space-y-8">
+                <div className="inline-flex items-center px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full mb-6">
+                  <Smartphone className="w-4 h-4 text-emerald-400 mr-2" />
+                  <span className="text-sm text-emerald-400 font-medium">
+                    Download on Android
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+                    Get Started with
+                    <span className="block bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">
+                      Securo Mobile
+                    </span>
+                    Today!
+                  </h3>
+                  <p className="text-xl text-zinc-400 leading-relaxed max-w-lg">
+                    Securo Mobile gives you everything you need to stay safe
+                    from digital threats with easy access from your smartphone.
+                  </p>
+                </div>
+
+                <motion.button
+                  className="group relative overflow-hidden rounded-2xl px-8 py-4 transition-all duration-300 hover:scale-105"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-400 bg-size-200 animate-gradient-x"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-2xl blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-300"></div>
+
+                  <div className="relative flex items-center justify-center space-x-3 text-neutral-900">
+                    <span className="text-lg font-bold">Download the app</span>
+                    <motion.svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      animate={{
+                        x: [0, 3, 0],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
+                    </motion.svg>
+                  </div>
+                </motion.button>
+              </div>
+
+              {/* Phone Images */}
+              <div className="relative flex justify-center lg:justify-end">
+                <div className="relative">
+                  <div className="absolute -inset-8 bg-gradient-to-r from-emerald-500/20 to-emerald-400/20 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+                  <motion.div
+                    className="relative"
+                    animate={{
+                      y: [0, -20, 0],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <img
+                      src="../public/securo.png"
+                      alt="Securo Mobile App Screenshots"
+                      className="max-w-full h-auto drop-shadow-2xl"
+                      style={{
+                        maxWidth: "500px",
+                        filter:
+                          "drop-shadow(0 25px 50px rgba(16, 185, 129, 0.3))",
+                      }}
+                    />
+                  </motion.div>
+
+                  {/* Floating elements */}
+                  <motion.div
+                    className="absolute -top-4 -left-4 w-16 h-16 bg-emerald-500/20 rounded-2xl backdrop-blur-sm border border-emerald-400/30 flex items-center justify-center"
+                    animate={{
+                      rotate: [0, 360],
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      rotate: {
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: "linear",
+                      },
+                      scale: {
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      },
+                    }}
+                  >
+                    <ShieldCheck className="w-8 h-8 text-emerald-400" />
+                  </motion.div>
+
+                  <motion.div
+                    className="absolute -bottom-6 -right-6 w-14 h-14 bg-emerald-600/20 rounded-xl backdrop-blur-sm border border-emerald-300/30 flex items-center justify-center"
+                    animate={{
+                      y: [0, -10, 0],
+                      rotate: [0, -10, 10, 0],
+                    }}
+                    transition={{
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <Smartphone className="w-6 h-6 text-emerald-300" />
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full mb-6">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 mr-2" />
+            <span className="text-sm text-emerald-400 font-medium">
               Powered by AstraAI
             </span>
           </div>
@@ -590,7 +763,7 @@ function App() {
             <div className="ai-text md:mr-auto">
               <h1
                 style={{
-                  fontSize: "clamp(1.5rem, 5vw, 2.5rem)",
+                  fontSize: "clamp(1.5rem, 5vw, 2rem)",
                   fontWeight: "bold",
                   color: "#00ff99",
                   width: "100%",
@@ -604,7 +777,7 @@ function App() {
                   marginTop: "20px",
                 }}
               >
-                Your AI Smart Assistant Against Digital Scams
+                Your AI Voice-Powered Assistant Against Digital Scams
               </h1>
 
               <h2
@@ -616,9 +789,9 @@ function App() {
                   marginTop: "30px",
                 }}
               >
-                Protect yourself from digital scams with our intelligent AI
-                assistant. Detect phishing links, fraudulent messages, and cyber
-                threats in real time.
+                Get security guidance in your preferred language. Our AI
+                assistant supports Hindi, Marathi, and multiple regional
+                languages to ensure everyone stays protected.
               </h2>
 
               <div
@@ -728,8 +901,7 @@ function App() {
           </div>
         </div>
 
-        <Footer/>
-
+        <Footer />
       </div>
 
       <style>{`
