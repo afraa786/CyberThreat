@@ -409,25 +409,25 @@ export default function App() {
                 />
               </div>
               
-              {isRecording ? (
-                <div className="relative">
-                  <div className="absolute -inset-2 bg-red-500/20 rounded-full animate-pulse"></div>
-                  <button
-                    onClick={stopRecording}
-                    className="relative p-2 bg-red-600 hover:bg-red-500 rounded-xl transition-colors mb-2 flex items-center justify-center min-w-[40px] h-10 shadow-sm z-10"
-                  >
-                    <Square className="h-4 w-4 text-white" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={startRecording}
-                  disabled={loading || microphonePermission === "denied"}
-                  className="p-2 text-emerald-400 hover:text-emerald-300 hover:bg-neutral-700/50 disabled:hover:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors mb-2 flex items-center justify-center min-w-[40px] h-10"
-                >
-                  <Mic className="h-5 w-5" />
-                </button>
-              )}
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                disabled={loading || microphonePermission === "denied"}
+                className={`relative p-2 rounded-xl transition-all duration-300 mb-2 flex items-center justify-center min-w-[40px] h-10 z-10 ${
+                  isRecording 
+                    ? 'bg-emerald-500 hover:bg-emerald-400 text-neutral-900 shadow-lg shadow-emerald-500/50' 
+                    : 'text-emerald-400 hover:text-emerald-300 hover:bg-neutral-700/50 disabled:hover:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                {isRecording && (
+                  <>
+                    <div className="absolute inset-0 rounded-xl bg-emerald-400/30 animate-ping"></div>
+                    <div className="absolute inset-0 rounded-xl bg-emerald-500/20 animate-pulse"></div>
+                  </>
+                )}
+                <Mic className={`h-5 w-5 relative z-10 transition-all duration-200 ${
+                  isRecording ? 'animate-pulse text-neutral-900' : ''
+                }`} />
+              </button>
               
               <button
                 onClick={sendMessage}
@@ -470,8 +470,37 @@ export default function App() {
           }
         }
         
+        @keyframes sound-wave-1 {
+          0%, 100% { height: 8px; opacity: 0.5; }
+          50% { height: 20px; opacity: 1; }
+        }
+        
+        @keyframes sound-wave-2 {
+          0%, 100% { height: 16px; opacity: 0.7; }
+          50% { height: 28px; opacity: 1; }
+        }
+        
+        @keyframes sound-wave-3 {
+          0%, 100% { height: 12px; opacity: 0.6; }
+          50% { height: 24px; opacity: 1; }
+        }
+        
         .animate-fade-in {
           animation: fade-in 0.3s ease-out;
+        }
+        
+        .animate-sound-wave-1 {
+          animation: sound-wave-1 1.2s ease-in-out infinite;
+        }
+        
+        .animate-sound-wave-2 {
+          animation: sound-wave-2 1.0s ease-in-out infinite;
+          animation-delay: 0.1s;
+        }
+        
+        .animate-sound-wave-3 {
+          animation: sound-wave-3 1.4s ease-in-out infinite;
+          animation-delay: 0.2s;
         }
         
         .prose-green {

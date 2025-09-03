@@ -4,7 +4,7 @@ import {
   Users, Plus, Search, TrendingUp, Clock, Award, MessageCircle,
   ArrowUp, ArrowDown, Share2, Bookmark, ExternalLink, Eye,
   Filter, Settings, Bell, Globe, Shield, Star, Hash,
-  ChevronRight, Calendar, UserPlus, AlertTriangle
+  ChevronRight, Calendar, UserPlus, AlertTriangle, X
 } from 'lucide-react';
 import { Navibar } from './navbar';
 
@@ -83,7 +83,7 @@ const CommunityPage: React.FC = () => {
       ],
       isJoined: false,
       category: 'Technology',
-      tags: ['security', 'threats', 'malware', 'pentesting', 'compliance']
+      tags: ['security', 'threats']
     },
     {
       id: '2',
@@ -105,7 +105,7 @@ const CommunityPage: React.FC = () => {
       ],
       isJoined: true,
       category: 'Education',
-      tags: ['phishing', 'education', 'social-engineering', 'awareness']
+      tags: ['phishing', 'education']
     },
     {
       id: '3',
@@ -127,7 +127,7 @@ const CommunityPage: React.FC = () => {
       ],
       isJoined: false,
       category: 'Intelligence',
-      tags: ['intel', 'iocs', 'attribution', 'analysis']
+      tags: ['intel', 'analysis']
     },
     {
       id: '4',
@@ -149,7 +149,7 @@ const CommunityPage: React.FC = () => {
       ],
       isJoined: true,
       category: 'Response',
-      tags: ['forensics', 'incident', 'investigation', 'response', 'analysis']
+      tags: ['forensics', 'response']
     },
     {
       id: '5',
@@ -171,7 +171,7 @@ const CommunityPage: React.FC = () => {
       ],
       isJoined: false,
       category: 'Testing',
-      tags: ['redteam', 'pentesting', 'ethical-hacking', 'testing', 'offensive']
+      tags: ['redteam', 'testing']
     },
     {
       id: '6',
@@ -193,7 +193,7 @@ const CommunityPage: React.FC = () => {
       ],
       isJoined: true,
       category: 'Defense',
-      tags: ['blueteam', 'defense', 'monitoring', 'soc', 'hunting']
+      tags: ['blueteam', 'defense']
     },
     {
       id: '7',
@@ -215,7 +215,7 @@ const CommunityPage: React.FC = () => {
       ],
       isJoined: false,
       category: 'Cryptography',
-      tags: ['crypto', 'encryption', 'blockchain', 'protocols', 'algorithms']
+      tags: ['crypto', 'encryption']
     },
     {
       id: '8',
@@ -237,7 +237,7 @@ const CommunityPage: React.FC = () => {
       ],
       isJoined: true,
       category: 'News',
-      tags: ['news', 'vulnerabilities', 'updates', 'industry', 'trends']
+      tags: ['news', 'updates']
     },
     {
       id: '9',
@@ -259,7 +259,7 @@ const CommunityPage: React.FC = () => {
       ],
       isJoined: false,
       category: 'Privacy',
-      tags: ['privacy', 'anonymity', 'vpn', 'tor', 'encryption']
+      tags: ['privacy', 'anonymity']
     }
   ];
   
@@ -294,19 +294,29 @@ const CommunityPage: React.FC = () => {
   ];
 
   // State
-  const [communities] = useState<Community[]>(sampleCommunities);
+  const [communities, setCommunities] = useState<Community[]>(sampleCommunities);
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
   const [posts] = useState<Post[]>(samplePosts);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedTag, setSelectedTag] = useState<string>('');
   const [sortBy, setSortBy] = useState<'hot' | 'new' | 'top'>('hot');
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [activeTab, setActiveTab] = useState<'posts' | 'about' | 'rules'>('posts');
 
-  const filteredCommunities = communities.filter(community =>
-    community.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    community.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    community.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const allCategories = Array.from(new Set(communities.map(c => c.category)));
+  const allTags = Array.from(new Set(communities.flatMap(c => c.tags)));
+
+  const filteredCommunities = communities.filter(community => {
+    const matchesSearch = community.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      community.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      community.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesCategory = !selectedCategory || community.category === selectedCategory;
+    const matchesTag = !selectedTag || community.tags.includes(selectedTag);
+    
+    return matchesSearch && matchesCategory && matchesTag;
+  });
 
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
@@ -330,11 +340,33 @@ const CommunityPage: React.FC = () => {
   };
 
   const joinCommunity = (communityId: string) => {
-    setSelectedCommunity(prev => 
-      prev && prev.id === communityId 
-        ? { ...prev, isJoined: !prev.isJoined, members: prev.isJoined ? prev.members - 1 : prev.members + 1 }
-        : prev
+    setCommunities(prevCommunities =>
+      prevCommunities.map(community =>
+        community.id === communityId
+          ? {
+              ...community,
+              isJoined: !community.isJoined,
+              members: community.isJoined ? community.members - 1 : community.members + 1
+            }
+          : community
+      )
     );
+    
+    if (selectedCommunity && selectedCommunity.id === communityId) {
+      setSelectedCommunity(prev => 
+        prev ? {
+          ...prev,
+          isJoined: !prev.isJoined,
+          members: prev.isJoined ? prev.members - 1 : prev.members + 1
+        } : prev
+      );
+    }
+  };
+
+  const clearFilters = () => {
+    setSelectedCategory('');
+    setSelectedTag('');
+    setSearchQuery('');
   };
 
   return (
@@ -343,7 +375,6 @@ const CommunityPage: React.FC = () => {
       
       <div className="container mx-auto mt-1 p-4 md:p-8">
         {!selectedCommunity ? (
-          // Communities List View
           <div>
             {/* Header */}
             <motion.div
@@ -386,8 +417,9 @@ const CommunityPage: React.FC = () => {
               <div className="relative rounded-2xl bg-neutral-800/50 p-6 backdrop-blur-sm border border-neutral-700/50 shadow-2xl">
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
                 <div className="relative z-10">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1 relative">
+                  {/* Search Bar */}
+                  <div className="mb-6">
+                    <div className="relative">
                       <Search className="absolute left-4 top-4 h-5 w-5 text-neutral-500" />
                       <input
                         value={searchQuery}
@@ -396,17 +428,92 @@ const CommunityPage: React.FC = () => {
                         className="w-full pl-12 pr-4 py-4 bg-neutral-900/50 border border-neutral-600 rounded-xl text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400 transition-all duration-300"
                       />
                     </div>
-                    <div className="flex gap-2">
-                      {['Technology', 'Education', 'Intelligence'].map(category => (
+                  </div>
+
+                  {/* Category Filters */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Filter className="h-4 w-4 text-emerald-400" />
+                      <span className="text-sm font-medium text-neutral-300">Filter by Category:</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => setSelectedCategory('')}
+                        className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${
+                          selectedCategory === '' 
+                            ? 'bg-emerald-400/20 text-emerald-400 border-emerald-400/50' 
+                            : 'bg-neutral-700/50 text-neutral-300 border-neutral-600 hover:bg-emerald-400/10 hover:text-emerald-400'
+                        }`}
+                      >
+                        All Categories
+                      </button>
+                      {allCategories.map(category => (
                         <button
                           key={category}
-                          className="px-4 py-2 bg-neutral-700/50 text-neutral-300 rounded-xl hover:bg-emerald-400/20 hover:text-emerald-400 transition-all duration-300 border border-neutral-600"
+                          onClick={() => setSelectedCategory(category)}
+                          className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${
+                            selectedCategory === category 
+                              ? 'bg-emerald-400/20 text-emerald-400 border-emerald-400/50' 
+                              : 'bg-neutral-700/50 text-neutral-300 border-neutral-600 hover:bg-emerald-400/10 hover:text-emerald-400'
+                          }`}
                         >
                           {category}
                         </button>
                       ))}
                     </div>
                   </div>
+
+                  {/* Tag Filters */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Hash className="h-4 w-4 text-emerald-400" />
+                      <span className="text-sm font-medium text-neutral-300">Filter by Tag:</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => setSelectedTag('')}
+                        className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${
+                          selectedTag === '' 
+                            ? 'bg-emerald-400/20 text-emerald-400 border-emerald-400/50' 
+                            : 'bg-neutral-700/50 text-neutral-300 border-neutral-600 hover:bg-emerald-400/10 hover:text-emerald-400'
+                        }`}
+                      >
+                        All Tags
+                      </button>
+                      {allTags.map(tag => (
+                        <button
+                          key={tag}
+                          onClick={() => setSelectedTag(tag)}
+                          className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${
+                            selectedTag === tag 
+                              ? 'bg-emerald-400/20 text-emerald-400 border-emerald-400/50' 
+                              : 'bg-neutral-700/50 text-neutral-300 border-neutral-600 hover:bg-emerald-400/10 hover:text-emerald-400'
+                          }`}
+                        >
+                          #{tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Active Filters & Clear */}
+                  {(selectedCategory || selectedTag || searchQuery) && (
+                    <div className="flex items-center justify-between pt-4 border-t border-neutral-700/50">
+                      <div className="flex items-center gap-2 text-sm text-neutral-400">
+                        <span>Active filters:</span>
+                        {searchQuery && <span className="px-2 py-1 bg-emerald-400/20 text-emerald-400 rounded-md">"{searchQuery}"</span>}
+                        {selectedCategory && <span className="px-2 py-1 bg-emerald-400/20 text-emerald-400 rounded-md">{selectedCategory}</span>}
+                        {selectedTag && <span className="px-2 py-1 bg-emerald-400/20 text-emerald-400 rounded-md">#{selectedTag}</span>}
+                      </div>
+                      <button
+                        onClick={clearFilters}
+                        className="text-sm text-neutral-400 hover:text-emerald-400 transition-colors flex items-center gap-1"
+                      >
+                        <X className="h-3 w-3" />
+                        Clear all
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -422,14 +529,11 @@ const CommunityPage: React.FC = () => {
                   className="relative rounded-2xl bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50 shadow-2xl overflow-hidden cursor-pointer group hover:border-emerald-400/50 transition-all duration-300"
                   onClick={() => setSelectedCommunity(community)}
                 >
-                  {/* Banner */}
-                  <div 
-                    className="h-24 relative"
-                    style={{ background: community.banner }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-transparent"></div>
-                    <div className="absolute bottom-4 left-6">
-                      <div className="w-12 h-12 bg-neutral-800 rounded-xl flex items-center justify-center text-2xl border-2 border-neutral-700 group-hover:border-emerald-400 transition-all duration-300">
+                  {/* Header Section - No colorful banner */}
+                  <div className="h-20 relative bg-gradient-to-br from-neutral-700/50 to-neutral-800/50">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent"></div>
+                    <div className="absolute bottom-3 left-6">
+                      <div className="w-12 h-12 bg-neutral-800/80 rounded-xl flex items-center justify-center text-2xl border-2 border-neutral-700 group-hover:border-emerald-400/50 transition-all duration-300 backdrop-blur-sm">
                         {community.icon}
                       </div>
                     </div>
@@ -503,6 +607,32 @@ const CommunityPage: React.FC = () => {
               ))}
             </div>
 
+            {/* No Results */}
+            {filteredCommunities.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center py-12"
+              >
+                <div className="relative rounded-2xl bg-neutral-800/50 p-8 backdrop-blur-sm border border-neutral-700/50 shadow-2xl">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent rounded-2xl"></div>
+                  <div className="relative z-10">
+                    <Search className="h-12 w-12 text-neutral-600 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-neutral-300 mb-2">No communities found</h3>
+                    <p className="text-neutral-400 mb-4">
+                      Try adjusting your search or filter criteria
+                    </p>
+                    <button
+                      onClick={clearFilters}
+                      className="px-4 py-2 bg-emerald-400/20 text-emerald-400 rounded-xl hover:bg-emerald-400/30 transition-all duration-300"
+                    >
+                      Clear filters
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             {/* Popular Tags */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -517,14 +647,15 @@ const CommunityPage: React.FC = () => {
                   Popular Tags
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {['security', 'malware', 'phishing', 'pentesting', 'compliance', 'forensics', 'incident-response', 'threat-hunting'].map(tag => (
+                  {allTags.map(tag => (
                     <button
                       key={tag}
+                      onClick={() => setSelectedTag(tag)}
                       className="p-3 bg-neutral-700/30 rounded-xl text-neutral-300 hover:bg-emerald-400/20 hover:text-emerald-400 transition-all duration-300 text-left"
                     >
                       <div className="font-medium">#{tag}</div>
                       <div className="text-xs text-neutral-500 mt-1">
-                        {Math.floor(Math.random() * 500) + 100} posts
+                        {communities.filter(c => c.tags.includes(tag)).length} communities
                       </div>
                     </button>
                   ))}
@@ -550,17 +681,14 @@ const CommunityPage: React.FC = () => {
               </button>
 
               <div className="relative rounded-2xl bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50 shadow-2xl overflow-hidden">
-                {/* Banner */}
-                <div 
-                  className="h-32 relative"
-                  style={{ background: selectedCommunity.banner }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-transparent"></div>
+                {/* Header - No colorful banner */}
+                <div className="h-32 relative bg-gradient-to-br from-neutral-700/50 to-neutral-800/50">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 to-transparent"></div>
                 </div>
 
                 <div className="p-8 relative">
                   <div className="absolute -top-8 left-8">
-                    <div className="w-16 h-16 bg-neutral-800 rounded-2xl flex items-center justify-center text-3xl border-4 border-neutral-700">
+                    <div className="w-16 h-16 bg-neutral-800/90 rounded-2xl flex items-center justify-center text-3xl border-4 border-neutral-700 backdrop-blur-sm">
                       {selectedCommunity.icon}
                     </div>
                   </div>
@@ -941,7 +1069,7 @@ const CommunityPage: React.FC = () => {
                     onClick={() => setShowCreatePost(false)}
                     className="p-2 hover:bg-neutral-700 rounded-full text-neutral-400 hover:text-neutral-300 transition-colors"
                   >
-                    ✕
+                    <X className="h-4 w-4" />
                   </button>
                 </div>
               </div>
