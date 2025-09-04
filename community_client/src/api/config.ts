@@ -21,7 +21,7 @@ export const API_CONFIG = {
     USER_ACTIVITY: '/api/community/users/activity/',
   },
 
-  // Headers
+  // Headers  
   HEADERS: {
     'Content-Type': 'application/json',
   },

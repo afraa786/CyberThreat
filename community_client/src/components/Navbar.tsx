@@ -21,7 +21,7 @@ export default function Navbar() {
     <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-4xl">
       <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-lg px-6 py-3 flex items-center justify-between">
         {/* Logo / Brand */}
-        <h1 className="text-lg font-bold text-white">MyApp</h1>
+        <h1 className="text-lg font-bold text-white">Securo</h1>
 
         {/* Links */}
         <div className="flex gap-6 text-white font-medium">

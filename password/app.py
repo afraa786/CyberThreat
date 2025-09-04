@@ -31,4 +31,4 @@ def check_password():
     return jsonify({"password": password, "pwned_count": count})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port =9999)

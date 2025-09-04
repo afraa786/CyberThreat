@@ -46,6 +46,12 @@ export function Navibar() {
     navigate("/profile");
   }
 
+  // Function to handle community navigation
+  const handleCommunityClick = () => {
+    // Open the community application in a new tab
+    window.open("http://localhost:3001/Login", "_blank");
+  };
+
   return (
     <div className="w-full top-0 left-0 z-40 bg-neutral-900/80 backdrop-blur-sm">
       <div className="container mx-auto p-4 md:p-8">
@@ -69,7 +75,7 @@ export function Navibar() {
                   </li>
                   <li className="group relative flex-shrink-0">
                     <button
-                      onClick={() => navigate("/community")}
+                      onClick={handleCommunityClick}
                       className="flex items-center px-2 py-1 text-sm xl:text-base text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
                     >
                       <span>Community</span>
@@ -94,6 +100,7 @@ export function Navibar() {
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
+                  
                   <li className="group relative flex-shrink-0">
                     <button
                       onClick={() => navigate("/wifi")}
@@ -130,6 +137,15 @@ export function Navibar() {
                     </button>
                     <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
                   </li>
+                    <li className="group relative flex-shrink-0">
+                    <button
+                      onClick={() => navigate("/map")}
+                      className="flex items-center px-2 py-1 text-sm xl:text-base text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
+                    >
+                      <span>Analyze</span>
+                    </button>
+                    <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
+                  </li>
                 </ul>
               </nav>
 
@@ -146,7 +162,7 @@ export function Navibar() {
                   </li>
                   <li className="group relative">
                     <button
-                      onClick={() => navigate("/community")}
+                      onClick={handleCommunityClick}
                       className="px-1 py-1 text-xs text-neutral-400 transition-colors hover:text-emerald-400 whitespace-nowrap"
                     >
                       Community
@@ -308,10 +324,6 @@ export function Navibar() {
             </div>
 
             <div className="flex items-center space-x-2 flex-shrink-0">
-              {/* <button className="flex items-center justify-center rounded-full bg-emerald-400/10 p-2 text-emerald-400 transition-all hover:bg-emerald-400/20">
-                <Shield className="h-4 w-4 xl:h-5 xl:w-5" />
-              </button> */}
-
               {/* Logout Button */}
               <button
                 onClick={handleLogout}
@@ -345,7 +357,7 @@ export function Navibar() {
                 </li>
                 <li className="group">
                   <button
-                    onClick={() => navigate("/community")}
+                    onClick={handleCommunityClick}
                     className="block text-neutral-400 hover:text-emerald-400 py-1"
                   >
                     Community

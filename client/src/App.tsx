@@ -18,7 +18,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import FeaturesSection from "./components/Features.tsx";
 import Footer from "./components/Footer.jsx";
-import { Navibar } from "./components/Navbar.tsx";
+import { Navibar } from "./components/navbar.tsx";
 
 const CursorFollower = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });

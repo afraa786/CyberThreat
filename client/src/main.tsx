@@ -17,7 +17,7 @@ import Profile from "./pages/Profile.tsx";
 import Community from "./components/community.tsx";
 import Email from "./components/email.tsx";
 //import Check from "./components/check.tsx";
-
+import CyberThreatDashboard from "./components/map.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -37,6 +37,14 @@ const router = createBrowserRouter([
       <ProtectedRoute>
       <WiChainDashboard />
      </ProtectedRoute>
+  ),
+},
+{
+  path: "/map",
+  element: (
+      <ProtectedRoute>
+      <CyberThreatDashboard />
+      </ProtectedRoute>
   ),
 },
   {
