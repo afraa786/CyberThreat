@@ -1,0 +1,28 @@
+services:
+  community_client:
+    build:
+      context: ./community_client
+      dockerfile: Dockerfile
+    container_name: community_client_api
+    ports:
+      - "3001:3001"
+    networks:
+      - templet
+
+  community_server:
+    build:
+      context: ./Community/server
+      dockerfile: Dockerfile
+    container_name: community_server_api
+    volumes:
+      - ./Community/server:/app
+    ports:
+      - "9000:9000"
+    networks:
+      - templet
+    depends_on:
+      - community_client
+
+networks:
+  templet:
+    driver: bridge

@@ -1,6 +1,6 @@
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:8000',
+  BASE_URL: 'http://localhost:9000',
 
   // Portfolio endpoints
 
@@ -24,7 +24,6 @@ export const API_CONFIG = {
   // Headers
   HEADERS: {
     'Content-Type': 'application/json',
-    'x-auth-app': process.env.NEXT_PUBLIC_FRONTEND_SECRET_KEY || 'literacyprojectnamesasapi#2501@called',
   },
 } as const;
 
@@ -47,7 +46,5 @@ export const getAuthMultipartHeaders = (token?: string) => {
   if (token) {
     headers['Authorization'] = token;
   }
-  // ⚠️ Do NOT set "Content-Type" here. Browser automatically sets with proper boundary
-  headers['x-auth-app'] = process.env.NEXT_PUBLIC_FRONTEND_SECRET_KEY || 'literacyprojectnamesasapi#2501@called';
   return headers;
 };

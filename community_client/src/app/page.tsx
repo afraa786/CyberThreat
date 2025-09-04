@@ -16,7 +16,7 @@ export default function Home() {
         }
 
         // verify token with backend
-        const res = await fetch("http://localhost:8000/api/authentication/user", {
+        const res = await fetch("http://localhost:9000/api/authentication/user", {
           headers: {
             "Authorization": `${token}`,
           },

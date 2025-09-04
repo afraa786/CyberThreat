@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app/
 
 # Start the server
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "server.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:9000", "server.wsgi:application"]

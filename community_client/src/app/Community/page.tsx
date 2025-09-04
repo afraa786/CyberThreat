@@ -73,10 +73,15 @@ export default function Page() {
 
   if (!isAuthenticated) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-10">
-        <h1 className="text-2xl font-semibold mb-2">Communities</h1>
-        <p className="text-gray-400">Please login to view and create communities.</p>
-        <Link className="text-blue-400 underline" href="/login">
+      <div className="max-w-5xl mx-auto px-4 py-10 text-center">
+        <h1 className="text-3xl font-bold mb-4 text-white">🌌 Communities</h1>
+        <p className="text-gray-400 mb-4">
+          Please login to view and create communities.
+        </p>
+        <Link
+          className="inline-block px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition-colors shadow-lg"
+          href="/login"
+        >
           Go to Login
         </Link>
       </div>
@@ -84,50 +89,50 @@ export default function Page() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10 mt-24">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Communities</h1>
+    <div className="max-w-6xl mx-auto px-4 py-10 mt-20">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold text-white">🌌 Communities</h1>
         <button
           onClick={() => setShowCreate(!showCreate)}
-          className="px-4 py-2 rounded-md bg-white/10 hover:bg-white/20"
+          className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:opacity-90 transition-all shadow-md"
         >
-          {showCreate ? "Close" : "Create Community"}
+          {showCreate ? "Close" : "➕ Create Community"}
         </button>
       </div>
 
       {showCreate && (
         <form
           onSubmit={handleCreate}
-          className="mb-8 p-4 border border-gray-700 rounded-lg"
+          className="mb-10 p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl"
         >
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <input
-              className="px-3 py-2 rounded bg-black/30 border border-gray-700"
-              placeholder="Name"
+              className="px-3 py-2 rounded-md bg-black/40 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              placeholder="Community Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
             <input
-              className="px-3 py-2 rounded bg-black/30 border border-gray-700"
+              className="px-3 py-2 rounded-md bg-black/40 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
               placeholder="Description (optional)"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
             <input
-              className="sm:col-span-2 px-3 py-2 rounded bg-black/30 border border-gray-700"
+              className="sm:col-span-2 px-3 py-2 rounded-md bg-black/40 border border-gray-600 text-white file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-500"
               type="file"
               accept="image/*"
               onChange={(e) => setProfilePicture(e.target.files?.[0])}
             />
           </div>
-          <div className="mt-4">
+          <div className="mt-6">
             <button
               type="submit"
               disabled={creating}
-              className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-500 disabled:opacity-50"
+              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition-all shadow-md disabled:opacity-50 text-white"
             >
-              {creating ? "Creating..." : "Create"}
+              {creating ? "Creating..." : "🚀 Create"}
             </button>
           </div>
         </form>
@@ -136,36 +141,38 @@ export default function Page() {
       {loading && <p className="text-gray-400">Loading...</p>}
       {error && <p className="text-rose-400 mb-4">{error}</p>}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {communities.map((c) => (
           <Link
             key={c.id}
             href={`/Community/${c.id}`}
-            className="block border border-gray-700 rounded-lg hover:border-gray-500 transition-colors"
+            className="block rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-blue-500 hover:shadow-lg transition-all"
           >
-            <div className="p-4 flex items-start gap-3">
+            <div className="p-5 flex items-start gap-4">
               {c.profile_picture ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={c.profile_picture}
                   alt={c.name}
-                  className="w-12 h-12 rounded object-cover"
+                  className="w-14 h-14 rounded-xl object-cover border border-white/20"
                 />
               ) : (
-                <div className="w-12 h-12 rounded bg-white/10 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-lg font-bold">
                   {c.name?.[0]?.toUpperCase() || "C"}
                 </div>
               )}
               <div>
-                <div className="font-semibold">{c.name}</div>
+                <div className="font-semibold text-lg text-white">
+                  {c.name}
+                </div>
                 {c.description && (
                   <div className="text-sm text-gray-400 line-clamp-2">
                     {c.description}
                   </div>
                 )}
                 {typeof c.total_members_count !== "undefined" && (
-                  <div className="text-xs text-gray-500 mt-1">
-                    Members: {c.total_members_count}
+                  <div className="text-xs text-gray-500 mt-2">
+                    👥 Members: {c.total_members_count}
                   </div>
                 )}
               </div>
