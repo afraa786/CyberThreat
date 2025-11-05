@@ -1,94 +1,151 @@
-# Crowdsourced Cyber Threat Intelligence Platform
+# CyberThreat – Crowdsourced Cyber Threat Intelligence Platform
+
+**CyberThreat** is a real-time, crowdsourced cyber threat intelligence platform that empowers users to report, analyze, and defend against digital threats. The platform integrates a mobile application (Securo) built with Flutter, browser extensions, and an AI assistant for unified protection across devices.
+
+---
 
 ## Overview
-The **Crowdsourced Cyber Threat Intelligence Platform** is a real-time threat reporting and analysis system. It enables users to report phishing URLs, malware, and other cyber threats while utilizing Apache Kafka for event streaming. The platform is secured with JWT authentication and integrates a gamified cyberpunk-themed frontend for an engaging user experience.
 
-## Features
-- **Threat Reporting**: Users can report cyber threats like phishing URLs, malware, and suspicious activities.
-- **Real-time Streaming**: Uses Apache Kafka for real-time data streaming and threat intelligence aggregation.
-- **Secure Authentication**: JWT-based authentication for secure API access.
-- **Gamified UI**: XP points, badges, and user levels to encourage participation.
-- **Live Cyber Threat Map**: A visual representation of reported threats.
-- **Leaderboard & Missions**: Tracks top contributors and assigns mission-based challenges.
-- **Real-time Notifications**: Displays alerts for newly reported threats.
-- **Cyberpunk-Themed UI**: Dark mode with neon blue, green, and purple accents, glitch effects, and holographic buttons.
+CyberThreat enables individuals and organizations to:
+- Report phishing URLs, malware, and suspicious domains
+- Detect if their email or credentials have appeared in known data breaches
+- View real-time insights via an interactive threat map showing the most reported global threats
+- Receive AI-driven security alerts and voice-assisted responses
+- Use the Securo mobile app for SMS-based phishing detection and instant link analysis
 
-## Tech Stack
-### Backend:
-- **Spring Boot** (Java) - Core backend framework
-- **Supabase** (PostgreSQL) - Database for storing reported threats
-- **Apache Kafka** - Event streaming for real-time data processing
-- **Spring Security** - API authentication using JWT
-- **Flask** - URL detection Machine Learning Model
-- **FastAPI** - Cyber Security Analyst based Chat Model
+---
 
-### Frontend:
-- **React** - Modern UI framework
-- **TypeScript** - Integration
-- **Plain HTML** - structure of the frontend
-- **Tailwind CSS** - Cyberpunk-themed UI with animations
+## Securo Mobile Application
 
-### Deployment & Tools:
-- **Docker** - Containerized environment for seamless deployment
-- **CI/CD** - Automating build and deployment pipelines (planned)
-- **Vercel** - Deployment
+**Securo** is the companion mobile application to CyberThreat, built with Flutter. It functions as an intelligent message security scanner, analyzing SMS and notifications to detect scam or phishing links.
 
-## Installation & Setup
-### Prerequisites
-- Java 17+
-- Node.js 16+
-- Docker
-- Apache Kafka (for local development)
-- PostgreSQL (Supabase)
+### Key Features
+- Detect phishing links directly from SMS or notifications
+- Instant alerts for malicious URLs
+- Web extension support for browser users
+- Data breach detection for stored credentials
+- AI-powered assistant with voice interaction for quick security guidance
+
+---
+
+## Core Features
+
+| Feature | Description |
+|---------|-------------|
+| **Crowdsourced Threat Reporting** | Users can report phishing URLs, malware, or suspicious domains in real time |
+| **Kafka-Powered Event Streaming** | Apache Kafka handles real-time data flow for reported threats |
+| **Threat Map** | Displays the most reported cyber threats globally with visual analytics |
+| **Data Breach Checker** | Instantly verifies if your email or passwords were exposed in breaches |
+| **AI Security Assistant** | Smart voice-enabled chatbot trained to assist users with threat insights |
+| **Email Breach Detector** | Checks if your email has appeared in public breach databases |
+| **Web Extension** | Provides live website protection and URL analysis for desktop users |
+| **Securo Mobile App** | Detects phishing links from SMS and notifications |
+
+---
+
+## AI Assistant
+
+The built-in AI assistant, powered by a fine-tuned large language model, helps users by:
+- Explaining security alerts
+- Providing personalized safety advice
+- Supporting voice interaction for hands-free assistance
+
+---
+
+## Technology Stack
+
+| Layer | Technologies |
+|-------|--------------|
+| **Backend** | Spring Boot, Apache Kafka, REST API, Supabase |
+| **Frontend** | Next.js (Web), Flutter (Mobile - Securo) |
+| **Database** | PostgreSQL / Supabase |
+| **AI / ML** | Python, TensorFlow, NLP Models for breach and URL detection |
+| **Security** | JWT Authentication, Encryption, Rate Limiting |
+| **Extensions** | Browser extension for real-time link scanning |
+| **Infrastructure** | Dockerized microservices |
+
+---
+
+## Project Structure
+
+```
+CyberThreat/
+│
+├── ai_assistant/          # AI-powered voice & chat assistant
+├── client/                # Web client (Next.js)
+├── community/             # Crowdsourced reporting system
+├── community_client/      # User interface for reports
+├── extension/             # Browser extension code
+├── email/                 # Email breach detection service
+├── models/                # Threat and user data models
+├── password/              # Password leak verification module
+├── server/                # Spring Boot backend (API + Kafka)
+├── threatmap/             # Real-time threat map visualization
+├── Securo/                # Flutter mobile app (APK)
+└── README.md              # This file
+```
+
+---
+
+## Key Capabilities
+
+- Report and analyze phishing URLs and malware
+- View global threat analytics
+- Check if your email or password was breached
+- Interact with the AI Security Assistant via chat or voice
+- Receive instant alerts on SMS or website phishing attempts
+- Use browser extension for real-time link scanning
+- Manage security across all channels via the Securo mobile app
+
+---
+
+## Installation
+
+### Clone the Repository
+```bash
+git clone https://github.com/afraa786/CyberThreat.git
+cd CyberThreat
+```
 
 ### Backend Setup
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/cyberthreat-intelligence.git
-   cd cyberthreat-intelligence/backend
-   ```
-2. Configure environment variables in `application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/cyberthreats
-   spring.datasource.username=your_username
-   spring.datasource.password=your_password
-   jwt.secret=your_jwt_secret
-   kafka.bootstrap-servers=localhost:9092
-   ```
-3. Run the backend application:
-   ```bash
-   mvn spring-boot:run
-   ```
+```bash
+cd server
+mvn spring-boot:run
+```
 
-### Frontend Setup
-1. Navigate to the frontend directory:
-   ```bash
-   cd ../frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the frontend server:
-   ```bash
-   npm start
-   ```
+### Web Client Setup
+```bash
+cd client
+npm install
+npm run dev
+```
 
-## API Endpoints
-### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login and receive JWT token
+### Securo Mobile App Setup
+```bash
+cd Securo
+flutter pub get
+flutter run
+```
 
-### Threat Reporting
-- `POST /api/threats/report` - Submit a new threat
-- `GET /api/threats` - Fetch reported threats
-- `GET /api/threats/{id}` - Get details of a specific threat
+---
+
+## Future Enhancements
+
+- Integration with real-time Dark Web breach APIs
+- AI-based phishing URL prediction model
+- Advanced gamified user leaderboard
+- Multi-platform voice control for the AI assistant
+
+---
 
 ## Contributing
-We welcome contributions! Feel free to fork the repo, submit issues, and create pull requests.
+
+Contributions are welcome. Please submit pull requests or open issues to suggest improvements or report bugs.
 
 ## License
-This project is licensed under the **MIT License**.
+
+This project is licensed under the MIT License. See the LICENSE file for details.
 
 ## Contact
-For any queries, feel free to reach out
+
+For questions or support, please open an issue on the GitHub repository.
