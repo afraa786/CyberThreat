@@ -56,7 +56,7 @@ The built-in AI assistant, powered by a fine-tuned large language model, helps u
 
 | Layer | Technologies |
 |-------|--------------|
-| **Backend** | Spring Boot, Apache Kafka, REST API, Supabase |
+| **Backend** | Spring Boot, Apache Kafka, REST API, Supabase, FastAPI, Django |
 | **Frontend** | Next.js (Web), Flutter (Mobile - Securo) |
 | **Database** | PostgreSQL / Supabase |
 | **AI / ML** | Python, TensorFlow, NLP Models for breach and URL detection |
