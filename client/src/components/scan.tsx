@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Navibar } from "./Navbar";
+import { Navibar } from "./navbar";
 import {
   Card,
   CardContent,
