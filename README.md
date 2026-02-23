@@ -87,6 +87,9 @@ CyberThreat/
 
 ---
 
+<img width="1080" height="1350" alt="Your paragraph text" src="https://github.com/user-attachments/assets/fd40b92d-dbd1-4ac3-8500-0580644e03f6" />
+
+
 ## Key Capabilities
 
 - Report and analyze phishing URLs and malware
